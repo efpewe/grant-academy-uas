@@ -24,21 +24,21 @@ export default () => {
               category="Front-End"
               title="Mastering Bootstrap 5"
               description="Buat website responsif profesional dengan cepat tanpa repot."
-              link="/course-detail/bootstrap"
+              link="/course/bootstrap"
             />
             <CourseCard 
               image={jsThumb}
               category="Programming"
               title="JavaScript Modern (ES6+)"
               description="Fundamental JavaScript dari dasar hingga mahir untuk DOM dan API."
-              link="/course-detail/javascript"
+              link="/course/javascript"
             />
             <CourseCard 
               image={htmlThumb}
               category="Dasar Web"
               title="HTML5 & CSS3 Lengkap"
               description="Struktur dan styling fundamental yang wajib dikuasai setiap developer."
-              link="/course-detail/html-css"
+              link="/course/html-css"
             />
           </div>
         </div>
