@@ -10,6 +10,8 @@ import ComingSoon from './pages/ComingSoon'
 import NotFound from './pages/NotFound'
 import Subscribe from './pages/Subscribe'
 import Contact from './pages/Contact'
+import Register from './pages/Register'
+import Login from './pages/Login'
 
 function App() {
 
@@ -25,6 +27,8 @@ function App() {
       <Route path="/subscribe" element={<Subscribe />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/coming-soon" element={<ComingSoon />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
     </>
