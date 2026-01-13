@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://backendgrantacademy.ferpuwi.com/api', 
+  baseURL: 'https://backendgrantacademy.ferpuwi.com/api', 
   headers: {
     'Content-Type': 'application/json',
   },
