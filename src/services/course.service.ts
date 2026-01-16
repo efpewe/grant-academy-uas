@@ -44,4 +44,12 @@ export const courseService = {
     const response = await api.get(`/courses/${slug}`);
     return response.data;
   },
+  async createCourse(formData: FormData) {
+    const response = await api.post('/courses', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data', // Wajib untuk upload file
+      },
+    });
+    return response.data;
+  },
 };

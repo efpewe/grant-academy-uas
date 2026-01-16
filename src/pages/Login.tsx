@@ -1,13 +1,22 @@
 import { useState, type ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Tambah useLocation
+import { jwtDecode } from 'jwt-decode'; // Tambah jwtDecode
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/auth.service';
 import AuthLayout from '../components/templates/AuthLayout';
 import FormGroup from '../components/molecules/FormGroup';
 import Button from '../components/atoms/Button';
 
+// Definisi tipe token untuk TypeScript
+interface DecodedToken {
+  id: string;
+  role: 'student' | 'mentor' | 'admin';
+  exp: number;
+}
+
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation(); // Hook untuk membaca state history (redirect back)
   const { login } = useAuth();
   
   const [formData, setFormData] = useState({ identifier: '', password: '' });
@@ -24,9 +33,38 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await authService.login({identifier: formData.identifier, password: formData.password});
-      await login(response.data); 
-      navigate('/dashboard'); 
+      // 1. Request Login ke API
+      const response = await authService.login({
+        identifier: formData.identifier, 
+        password: formData.password
+      });
+
+      // 2. Simpan token ke Context & LocalStorage
+      // Asumsi: response.data berisi string token JWT
+      const token = response.data; 
+      await login(token); 
+
+      // 3. LOGIKA REDIRECT CERDAS
+      if (token) {
+        const decoded = jwtDecode<DecodedToken>(token);
+        
+        // Cek apakah ada halaman sebelumnya yang ingin dituju? (Misal: dari tombol "Daftar Kursus")
+        // location.state?.from?.pathname diset di component CourseDetail.tsx
+        const from = location.state?.from?.pathname;
+
+        if (from) {
+            // Jika ada history, kembalikan user ke sana (Course Detail)
+            navigate(from, { replace: true });
+        } else {
+            // Jika login biasa, arahkan sesuai Role
+            if (decoded.role === 'mentor') {
+                navigate('/mentor/dashboard', { replace: true });
+            } else {
+                navigate('/dashboard', { replace: true });
+            }
+        }
+      }
+
     } catch (err: any) {
       const message = err.response?.data?.message || "Login gagal. Cek koneksi atau data Anda.";
       setError(message);

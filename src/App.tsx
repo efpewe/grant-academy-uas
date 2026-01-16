@@ -17,6 +17,9 @@ import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 import MyCourses from './pages/MyCourse'
 import Transactions from './pages/Transactions';
+import Payment from './pages/Payment';
+import MentorDashboard from './pages/mentor/MentorDashboard'
+import CreateCourse from './pages/mentor/CreateCourse'
 function App() {
 
   return (
@@ -35,9 +38,12 @@ function App() {
       <Route path="/course/:slug" element={<CourseDetail />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/my-courses" element={<MyCourses />} /> {/* Route Baru */}
-  <Route path="/transactions" element={<Transactions />} /> {/* Route Baru */}
+        <Route path="/my-courses" element={<MyCourses />} />
+        <Route path="/transactions" element={<Transactions />} />
+        <Route path="/payment/:transactionId" element={<Payment />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/mentor/dashboard" element={<MentorDashboard />} />
+        <Route path="/mentor/create-course" element={<CreateCourse />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
