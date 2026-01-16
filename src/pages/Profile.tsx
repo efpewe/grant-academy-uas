@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import MainLayout from '../components/templates/MainLayout';
+import DashboardLayout from '../components/templates/DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/auth.service';
 
@@ -80,7 +80,7 @@ export default function Profile() {
   };
 
   return (
-    <MainLayout>
+    <DashboardLayout>
       <div className="max-w-6xl mx-auto px-4 py-10">
         <h1 className="text-3xl font-bold font-lexend text-gray-900 mb-8">Profil Saya</h1>
 
@@ -252,6 +252,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </DashboardLayout>
   );
 }

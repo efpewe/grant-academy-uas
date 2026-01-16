@@ -11,10 +11,12 @@ import NotFound from './pages/NotFound'
 import Contact from './pages/Contact'
 import Register from './pages/Register'
 import Login from './pages/Login'
-import Activation from './pages/Activation';
+import Activation from './pages/Activation'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
+import MyCourses from './pages/MyCourse'
+import Transactions from './pages/Transactions';
 function App() {
 
   return (
@@ -24,15 +26,17 @@ function App() {
       <Route path="/about" element={<About />} />
       <Route path="/bio/:id" element={<BioDetail />} />
       <Route path="/course" element={<Course />} />
-      <Route path="/course/:id" element={<CourseDetail />} />
       <Route path="/news" element={<News />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/coming-soon" element={<ComingSoon />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/auth/activation" element={<Activation />} />
+      <Route path="/course/:slug" element={<CourseDetail />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/my-courses" element={<MyCourses />} /> {/* Route Baru */}
+  <Route path="/transactions" element={<Transactions />} /> {/* Route Baru */}
         <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<NotFound />} />

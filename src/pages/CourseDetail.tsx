@@ -1,75 +1,125 @@
-import { useParams, Link } from 'react-router-dom'
-import MainLayout from '../components/templates/MainLayout'
-import Badge from '../components/atoms/Badge'
-import Button from '../components/atoms/Button'
-import { courses } from '../data/courses'
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import MainLayout from '../components/templates/MainLayout';
+import Badge from '../components/atoms/Badge'; 
+import { courseService, type Course } from '../services/course.service';
+import { transactionService } from '../services/transaction.service';
+import { useAuth } from '../contexts/AuthContext';
 
-export default () => {
-  const { id } = useParams()
-  const course = courses.find((c) => c.id === id)
+export default function CourseDetail() {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, hasPurchased, refreshProfile } = useAuth();
+  
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+
+  // --- LOG DEBUGGING (WAJIB MUNCUL) ---
+  console.log("🔥 RENDER COMPONENT JALAN! Slug:", slug); 
+  // ------------------------------------
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      // LOG DI DALAM EFFECT
+      console.log("🚀 useEffect Triggered. Mencari:", slug);
+
+      try {
+        if (slug) {
+          const result = await courseService.getCourseBySlug(slug);
+          console.log("📦 DATA API DITERIMA:", result); // Cek isi ini!
+
+          // Logic Penyelamat Data
+          if (result && result.data) {
+             setCourse(result.data);
+          } else {
+             setCourse(result); // Fallback jika data langsung object
+          }
+        }
+      } catch (error) {
+        console.error("❌ Gagal memuat kursus:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourse();
+  }, [slug]);
+
+  // Format Rupiah
+  const formatPrice = (price: number) => {
+    return price === 0 
+      ? "Gratis" 
+      : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
+  };
+
+  const handleEnroll = async () => {
+    if (!isAuthenticated || !user) { navigate('/login'); return; }
+    if (!course) return;
+
+    try {
+        setProcessing(true);
+        await transactionService.checkout(course._id);
+        await refreshProfile(); 
+        alert("Pendaftaran Berhasil!");
+        navigate('/my-courses');
+    } catch (error: any) {
+        alert(error.response?.data?.message || "Gagal.");
+    } finally {
+        setProcessing(false);
+    }
+  };
+
+  if (loading) return <MainLayout><div className="p-20 text-center">Loading...</div></MainLayout>;
 
   if (!course) {
     return (
       <MainLayout>
         <div className="container py-20 text-center">
           <h2 className="text-2xl font-bold">Kursus tidak ditemukan</h2>
-          <Link to="/course" className="text-primary mt-4 block">Kembali ke Daftar Kursus</Link>
+          <p className="text-gray-500 mb-4">Slug yang dicari: {slug}</p> {/* Tampilkan slug di layar */}
+          <button onClick={() => navigate('/dashboard')} className="text-primary font-bold">Kembali</button>
         </div>
       </MainLayout>
-    )
+    );
   }
+
+  // Cek Status Pembelian
+  const isOwned = user ? hasPurchased(course._id) : false;
 
   return (
     <MainLayout>
-      <section className="bg-[#f9f9f9] text-center pt-[64px] pb-[32px]">
-        <div className="container flex flex-col items-center">
+      {/* HEADER */}
+      <section className="bg-[#f9f9f9] text-center pt-16 pb-20 px-4">
+        <div className="container mx-auto flex flex-col items-center max-w-4xl">
           <Badge text={course.category} />
-          <h1 className="text-[32px] md:text-[48px] font-bold font-lexend text-dark mb-4 leading-tight">
-            {course.title}
-          </h1>
-          <p className="text-[18px] text-grey font-inter max-w-[700px]">
-            {course.subtitle}
-          </p>
-          <img 
-            src={course.image} 
-            alt={course.title} 
-            className="w-full max-w-[700px] rounded-lg mt-8 shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
-          />
+          <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
+          <p className="text-gray-500">Mentor: {course.mentor?.fullName}</p>
+          <img src={course.thumbnail} alt={course.title} className="w-full max-w-[700px] rounded-2xl mt-8 shadow-xl" />
         </div>
       </section>
 
-      <section className="pb-[80px] -mt-10 md:-mt-0">
-        <div className="container">
-          <div className="max-w-[800px] mx-auto bg-white p-6 md:p-8 rounded-xl md:shadow-none">
+      {/* CONTENT */}
+      <section className="pb-20 -mt-10 px-4">
+         <div className="max-w-[800px] mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-bold mb-4">Deskripsi</h2>
+            <p className="text-gray-600 mb-8 whitespace-pre-line">{course.description}</p>
             
-            <div className="mb-8">
-              <h2 className="text-[2rem] font-bold font-lexend text-dark mb-4">Deskripsi Kursus</h2>
-              <p className="text-[16px] text-[#5c5c5c] font-inter leading-[1.7]">
-                {course.description}
-              </p>
+            <div className="flex justify-between items-center pt-6 border-t">
+               <div>
+                  <p className="text-sm text-gray-400">Harga</p>
+                  <h3 className="text-2xl font-bold text-primary">{formatPrice(course.price)}</h3>
+               </div>
+               <button 
+                  onClick={isOwned ? () => navigate('/my-courses') : handleEnroll}
+                  disabled={processing}
+                  className={`px-8 py-3 rounded-full text-white font-bold ${isOwned ? 'bg-green-600' : 'bg-primary'}`}
+               >
+                  {isOwned ? 'Lanjut Belajar' : 'Daftar Sekarang'}
+               </button>
             </div>
-
-            <div className="bg-primary-light/30 p-6 rounded-lg mb-8">
-              <h2 className="text-[24px] font-bold font-lexend text-dark mb-6">Apa yang Akan Dipelajari?</h2>
-              <ul className="space-y-4">
-                {course.modules.map((modul, idx) => (
-                  <li key={idx} className="flex items-start text-[1.1rem] text-dark font-inter">
-                    <span className="mr-3 text-primary font-bold text-xl leading-none">✓</span>
-                    {modul}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="text-center md:text-left">
-                <Link to="/subscribe">
-                    <Button>DAFTAR SEKARANG</Button>
-                </Link>
-            </div>
-
-          </div>
-        </div>
+         </div>
       </section>
     </MainLayout>
-  )
+  );
 }
