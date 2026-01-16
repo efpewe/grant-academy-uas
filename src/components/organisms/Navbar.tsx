@@ -19,7 +19,6 @@ export default function Navbar() {
     { label: 'ABOUT', path: '/about' },
     { label: 'COURSE', path: '/course' },
     { label: 'NEWS', path: '/news' },
-    { label: 'SUBSCRIBE', path: '/subscribe' },
     { label: 'CONTACT', path: '/contact' },
   ];
 

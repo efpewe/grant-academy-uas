@@ -14,5 +14,15 @@ export const authService = {
   async getMe() {
     const response = await api.get('/auth/me');
     return response.data;
+  },
+
+  async activation(code: string) {
+    const response = await api.post('/auth/activation', { code });
+    return response.data;
+  },
+
+  async updateProfile(data: any) {
+    const response = await api.put('/auth/profile', data);
+    return response.data;
   }
 };

@@ -8,11 +8,13 @@ import CourseDetail from './pages/CourseDetail'
 import News from './pages/News'
 import ComingSoon from './pages/ComingSoon'
 import NotFound from './pages/NotFound'
-import Subscribe from './pages/Subscribe'
 import Contact from './pages/Contact'
 import Register from './pages/Register'
 import Login from './pages/Login'
-
+import Activation from './pages/Activation';
+import Dashboard from './pages/Dashboard'
+import Profile from './pages/Profile'
+import ProtectedRoute from './components/ProtectedRoute'
 function App() {
 
   return (
@@ -24,11 +26,15 @@ function App() {
       <Route path="/course" element={<Course />} />
       <Route path="/course/:id" element={<CourseDetail />} />
       <Route path="/news" element={<News />} />
-      <Route path="/subscribe" element={<Subscribe />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/coming-soon" element={<ComingSoon />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/auth/activation" element={<Activation />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
     </>
