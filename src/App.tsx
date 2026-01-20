@@ -41,7 +41,8 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/my-courses" element={<MyCourses />} />
-        <Route path="/learn/:slug" element={<CoursePlayer />} />
+        <Route path="/learn/:courseSlug" element={<CoursePlayer />} />
+        <Route path="/learn/:courseSlug/:lessonSlug" element={<CoursePlayer />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/payment/:transactionId" element={<Payment />} />
         <Route path="/profile" element={<Profile />} />
