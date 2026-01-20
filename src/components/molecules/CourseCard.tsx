@@ -1,56 +1,62 @@
 import { Link } from 'react-router-dom';
-// Pastikan path import ini benar sesuai struktur folder Anda
-import {type Course } from '../../services/course.service'; 
+import { type Course } from '../../services/course.service';
 
 interface CourseCardProps {
   course: Course;
+  href?: string;       // Opsional: Custom Link
+  ctaText?: string;    // Opsional: Custom Text Tombol
 }
 
-export default function CourseCard({ course }: CourseCardProps) {
-  // PENGAMAN: Cek apakah slug ada. Jika tidak, fallback ke '#' atau string kosong
-  // Ini mencegah error /undefined
-  const linkTarget = course.slug ? `/course/${course.slug}` : '#';
+export default function CourseCard({ course, href, ctaText }: CourseCardProps) {
+  // Logic: Jika ada href custom (misal dari MyCourses), pakai itu.
+  // Jika tidak, default ke halaman detail (/course/slug).
+  const linkTarget = href ? href : (course.slug ? `/course/${course.slug}` : '#');
+  
+  // Format Rupiah
+  const formatPrice = (price: number) => {
+    return price === 0 
+      ? "Gratis" 
+      : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
+  };
 
   return (
     <Link 
-      to={linkTarget} // <--- PERBAIKAN DI SINI
-      className="block bg-white rounded-xl overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.07)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 group h-full flex flex-col"
+      to={linkTarget} 
+      className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group border border-gray-100 h-full flex flex-col"
     >
-      {/* Gambar Thumbnail */}
-      <div className="relative h-[200px] overflow-hidden">
+      {/* Thumbnail */}
+      <div className="relative h-48 overflow-hidden">
         <img 
-          src={course.thumbnail || 'https://via.placeholder.com/400x250?text=No+Image'} 
+          src={course.thumbnail} 
           alt={course.title} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
         />
+        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
+           {course.category}
+        </div>
       </div>
 
-      <div className="p-[25px] flex flex-col flex-grow">
-        {/* Badge Category */}
-        <div className="mb-[15px]">
-          <span className="inline-block px-3 py-1 rounded-full text-[12px] font-semibold font-lexend uppercase tracking-wider bg-primary/10 text-primary">
-            {course.category}
-          </span>
-        </div>
-
-        {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-[10px] font-lexend group-hover:text-primary transition-colors line-clamp-2">
+      {/* Content */}
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
           {course.title}
         </h3>
+        
+        <div className="flex items-center gap-2 mb-4 mt-auto">
+           <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
+              {/* Avatar placeholder */}
+              <img src={`https://ui-avatars.com/api/?name=${course.mentor?.fullName}&background=random`} alt="" />
+           </div>
+           <p className="text-sm text-gray-500 truncate">{course.mentor?.fullName || 'Mentor'}</p>
+        </div>
 
-        {/* Description */}
-        <p className="text-[15px] text-gray-500 leading-relaxed mb-5 font-inter line-clamp-3 flex-grow">
-          {course.description}
-        </p>
-
-        {/* Footer */}
-        <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
-            <span className="text-sm font-bold text-gray-400">
-                {course.level}
-            </span>
-            <div className="text-[15px] font-bold font-lexend text-primary flex items-center">
-            Lihat Detail <span className="ml-1">→</span>
-            </div>
+        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+           <span className="font-bold text-gray-900">
+              {formatPrice(course.price)}
+           </span>
+           <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
+              {ctaText || 'Lihat Detail'} {/* Teks dinamis */}
+           </span>
         </div>
       </div>
     </Link>

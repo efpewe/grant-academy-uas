@@ -21,6 +21,7 @@ import Payment from './pages/Payment';
 import MentorDashboard from './pages/mentor/MentorDashboard'
 import CreateCourse from './pages/mentor/CreateCourse'
 import AddLesson from './pages/mentor/AddLesson'
+import CoursePlayer from './pages/CoursePlayer';
 function App() {
 
   return (
@@ -40,6 +41,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/my-courses" element={<MyCourses />} />
+        <Route path="/learn/:slug" element={<CoursePlayer />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/payment/:transactionId" element={<Payment />} />
         <Route path="/profile" element={<Profile />} />
