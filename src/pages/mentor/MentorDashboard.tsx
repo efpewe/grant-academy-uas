@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/templates/DashboardLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import { courseService, type Course } from '../../services/course.service';
 
 export default function MentorDashboard() {
+  const navigate = useNavigate();
   const { user } = useAuth();
+  
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,9 +16,14 @@ export default function MentorDashboard() {
     const fetchMyCourses = async () => {
       try {
         const response = await courseService.getAllCourses();
+        
         // FILTER: Ambil hanya kursus milik mentor yang sedang login
-        // (Idealnya backend punya endpoint khusus /courses/me, tapi ini cara cepat di frontend)
-        const myCourses = response.data.filter((c: any) => c.mentor?._id === user?._id || c.mentor === user?._id);
+        // Kita cek dua kemungkinan: mentor berupa object (populated) atau string ID
+        const myCourses = response.data.filter((c: any) => {
+             const mentorId = c.mentor?._id || c.mentor; 
+             return mentorId === user?._id;
+        });
+
         setCourses(myCourses);
       } catch (error) {
         console.error("Gagal load data mentor", error);
@@ -24,7 +31,10 @@ export default function MentorDashboard() {
         setLoading(false);
       }
     };
-    fetchMyCourses();
+
+    if (user) {
+        fetchMyCourses();
+    }
   }, [user]);
 
   // Format Rupiah
@@ -46,7 +56,7 @@ export default function MentorDashboard() {
         </Link>
       </div>
 
-      {/* --- STATS CARDS (MOCKUP) --- */}
+      {/* --- STATS CARDS (DUMMY DATA) --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <div className="text-gray-500 text-sm font-medium mb-1">Total Kursus</div>
@@ -54,11 +64,11 @@ export default function MentorDashboard() {
          </div>
          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <div className="text-gray-500 text-sm font-medium mb-1">Total Siswa</div>
-            <div className="text-3xl font-bold text-gray-900">128</div> {/* Masih Dummy */}
+            <div className="text-3xl font-bold text-gray-900">128</div>
          </div>
          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <div className="text-gray-500 text-sm font-medium mb-1">Estimasi Pendapatan</div>
-            <div className="text-3xl font-bold text-primary">Rp 2.500.000</div> {/* Masih Dummy */}
+            <div className="text-3xl font-bold text-primary">Rp 2.500.000</div>
          </div>
       </div>
 
@@ -75,7 +85,7 @@ export default function MentorDashboard() {
                         <th className="p-5">Kursus</th>
                         <th className="p-5">Harga</th>
                         <th className="p-5">Kategori</th>
-                        <th className="p-5 text-center">Status</th>
+                        <th className="p-5 text-center">Materi</th>
                         <th className="p-5 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -100,13 +110,22 @@ export default function MentorDashboard() {
                                     </span>
                                 </td>
                                 <td className="p-5 text-center">
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Published
+                                    <span className="text-gray-500 font-medium">
+                                        {course.lessons?.length || 0} Video
                                     </span>
                                 </td>
                                 <td className="p-5 text-right space-x-2">
-                                    <button className="text-blue-600 hover:underline font-medium">Edit</button>
-                                    <button className="text-red-500 hover:underline font-medium">Hapus</button>
+                                    {/* TOMBOL TAMBAH MATERI */}
+                                    <button 
+                                       onClick={() => navigate(`/mentor/course/${course._id}/add-lesson`)}
+                                       className="text-green-600 hover:text-green-700 font-bold text-xs bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded-lg transition-all"
+                                    >
+                                       + Materi
+                                    </button>
+
+                                    {/* TOMBOL EDIT & HAPUS */}
+                                    <button className="text-blue-600 hover:underline font-medium text-sm">Edit</button>
+                                    <button className="text-red-500 hover:underline font-medium text-sm">Hapus</button>
                                 </td>
                             </tr>
                         ))

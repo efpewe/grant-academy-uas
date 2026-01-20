@@ -27,47 +27,75 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // 1. Request Login ke API
+      // 1. Panggil API
       const response = await authService.login({
         identifier: formData.identifier, 
         password: formData.password
       });
 
-      // 2. Simpan token ke Context & LocalStorage
-      // Asumsi: response.data berisi string token JWT
-      const token = response.data; 
+      // 🔥 LOG BRUTAL: LIHAT INI DI CONSOLE BROWSER (F12)
+      console.log("📦 1. RESPONSE UTUH:", response);
+      console.log("📦 2. RESPONSE.DATA:", response?.data);
+      console.log("📦 3. RESPONSE.DATA.DATA:", response?.data?.data);
+
+      // 2. LOGIKA PENCARI TOKEN (Cari sampai dapat)
+      let token = null;
+
+      if (response?.data?.data && typeof response.data.data === 'string') {
+          // KEMUNGKINAN 1: Axios Standar (Paling Sering)
+          console.log("✅ Token ditemukan di: response.data.data");
+          token = response.data.data;
+      } 
+      else if (response?.data && typeof response.data === 'string') {
+          // KEMUNGKINAN 2: Response langsung string token (Jarang)
+          console.log("✅ Token ditemukan di: response.data");
+          token = response.data;
+      }
+      else if (response?.data?.token && typeof response.data.token === 'string') {
+          // KEMUNGKINAN 3: Backend kirim { token: "..." }
+          console.log("✅ Token ditemukan di: response.data.token");
+          token = response.data.token;
+      }
+      else if (response?.token && typeof response.token === 'string') {
+           // KEMUNGKINAN 4: Interceptor sudah kupas data
+           console.log("✅ Token ditemukan di: response.token");
+           token = response.token;
+      }
+
+      // 3. STOP!! JANGAN LANJUT KALAU TOKEN KOSONG
+      if (!token) {
+        throw new Error("Token tidak ditemukan! Cek Console F12 untuk lihat struktur response.");
+      }
+
+      // 4. SIMPAN & DECODE (Sekarang aman karena token pasti ada isinya)
       await login(token); 
+      const decoded = jwtDecode<DecodedToken>(token);
 
-      // 3. LOGIKA REDIRECT CERDAS
-      if (token) {
-        const decoded = jwtDecode<DecodedToken>(token);
-        
-        // Cek apakah ada halaman sebelumnya yang ingin dituju? (Misal: dari tombol "Daftar Kursus")
-        // location.state?.from?.pathname diset di component CourseDetail.tsx
-        const from = location.state?.from?.pathname;
+      console.log("🔓 Role User:", decoded.role); // Cek Role di Console
 
-        if (from) {
-            // Jika ada history, kembalikan user ke sana (Course Detail)
-            navigate(from, { replace: true });
-        } else {
-            // Jika login biasa, arahkan sesuai Role
-            if (decoded.role === 'mentor') {
-                navigate('/mentor/dashboard', { replace: true });
-            } else {
-                navigate('/dashboard', { replace: true });
-            }
-        }
+      // 5. REDIRECT
+      const from = location.state?.from?.pathname;
+      if (from) {
+          navigate(from, { replace: true });
+      } else {
+          if (decoded.role === 'mentor') {
+              navigate('/mentor/dashboard', { replace: true });
+          } else {
+              navigate('/dashboard', { replace: true });
+          }
       }
 
     } catch (err: any) {
-      const message = err.response?.data?.message || "Login gagal. Cek koneksi atau data Anda.";
-      setError(message);
+      console.error("❌ ERROR LOGIN:", err);
+      // Tampilkan pesan error yang lebih jelas
+      const msg = err.message || err.response?.data?.message || "Terjadi kesalahan sistem.";
+      setError(msg);
     } finally {
       setLoading(false);
     }

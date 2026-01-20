@@ -52,4 +52,9 @@ export const courseService = {
     });
     return response.data;
   },
+  async addLesson(courseId: string, data: any) {
+    // Kita kirim JSON biasa
+    const response = await api.post(`/courses/${courseId}/lessons`, data);
+    return response.data;
+  },
 };

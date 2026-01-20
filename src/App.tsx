@@ -20,6 +20,7 @@ import Transactions from './pages/Transactions';
 import Payment from './pages/Payment';
 import MentorDashboard from './pages/mentor/MentorDashboard'
 import CreateCourse from './pages/mentor/CreateCourse'
+import AddLesson from './pages/mentor/AddLesson'
 function App() {
 
   return (
@@ -44,6 +45,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/mentor/dashboard" element={<MentorDashboard />} />
         <Route path="/mentor/create-course" element={<CreateCourse />} />
+        <Route path="/mentor/course/:courseId/add-lesson" element={<AddLesson />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
