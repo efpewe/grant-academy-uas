@@ -2,7 +2,7 @@ import api from '../utils/api';
 
 export const transactionService = {
   async checkout(courseId: string) {
-    const response = await api.post('/transactions/checkout', { courseId });
+    const response = await api.post('/transactions', { courseId });
     return response.data;
   },
 
@@ -15,5 +15,5 @@ export const transactionService = {
   async getTransactionDetail(transactionId: string) {
     const response = await api.get(`/transactions/${transactionId}`);
     return response.data;
-  }
+  },
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom'; // Tambah useLocation
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '../components/templates/MainLayout';
 import Badge from '../components/atoms/Badge'; 
 import { courseService, type Course } from '../services/course.service';
@@ -61,7 +61,7 @@ export default function CourseDetail() {
         setProcessing(true);
 
         // Panggil API Checkout
-        // Backend otomatis membuat transaksi (status: SETTLEMENT jika gratis, PENDING jika bayar)
+        // Pastikan nama method di service Anda adalah 'checkout' atau 'createTransaction'
         const result = await transactionService.checkout(course._id);
         const transactionData = result.data; // Ambil data transaksi yang baru dibuat
 
@@ -72,18 +72,21 @@ export default function CourseDetail() {
         if (course.price === 0) {
             // --- KELAS GRATIS ---
             alert("Berhasil mendaftar kelas gratis!");
-            navigate('/transactions'); // Sesuai request: Ke Transaction History
+            // Arahkan ke halaman user, misalnya Transaksi atau Kelas Saya
+            navigate('/transactions'); 
         } else {
             // --- KELAS BERBAYAR ---
-            // Arahkan ke halaman Payment sementara (sebelum Midtrans)
-            navigate(`/payment/${transactionData._id}`);
+            // Arahkan ke halaman Payment dengan membawa ID Transaksi
+            navigate(`/payment/${transactionData._id}`, { 
+                state: { transactionData: transactionData } 
+            });
         }
 
     } catch (error: any) {
         // Handle Error (Misal user sudah punya kursus)
         const msg = error.response?.data?.message || "Gagal memproses pendaftaran.";
         
-        if (msg.includes("already") || error.response?.status === 400) {
+        if (msg.toLowerCase().includes("already") || error.response?.status === 400) {
             alert("Anda sudah terdaftar di kelas ini.");
             navigate('/my-courses');
         } else {
@@ -111,6 +114,7 @@ export default function CourseDetail() {
   }
 
   // Cek Status Pembelian (Untuk ubah tombol jadi 'Lanjut Belajar')
+  // Kita handle kemungkinan course._id bertipe object atau string
   const isOwned = user ? hasPurchased(course._id) : false;
 
   return (
@@ -123,7 +127,7 @@ export default function CourseDetail() {
             {course.title}
           </h1>
           <p className="text-gray-500 text-lg">
-            Mentor: <span className="font-semibold text-gray-800">{course.mentor?.fullName}</span>
+            Mentor: <span className="font-semibold text-gray-800">{course.mentor?.fullName || 'Tim Grant Academy'}</span>
           </p>
           <img 
             src={course.thumbnail} 
@@ -141,14 +145,14 @@ export default function CourseDetail() {
                 {course.description}
             </p>
             
-            {/* List Materi (Opsional - Jika ada data lessons) */}
+            {/* List Materi */}
             {course.lessons && course.lessons.length > 0 && (
                 <div className="mb-8 p-6 bg-gray-50 rounded-xl">
                     <h3 className="font-bold mb-4">Materi yang akan dipelajari:</h3>
                     <ul className="space-y-2">
                         {course.lessons.map((lesson, idx) => (
                             <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                                <span className="text-primary">✓</span> {lesson.title}
+                                <span className="text-primary font-bold">✓</span> {lesson.title}
                             </li>
                         ))}
                     </ul>

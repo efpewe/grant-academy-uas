@@ -29,7 +29,7 @@ export default function MyCourses() {
           .map((trx: any) => trx.course)
           // Hapus data null (jika kursus sudah dihapus admin tapi transaksi masih ada)
           .filter((course: any) => course !== null);
-
+            console.log("DEBUG DATA KURSUS:", myPurchasedCourses);
         // 3. Hapus Duplikat
         // (Jaga-jaga jika user tidak sengaja beli kursus yang sama 2x sebelum validasi dipasang)
         const uniqueCourses = Array.from(
