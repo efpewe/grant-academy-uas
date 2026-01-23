@@ -6,15 +6,17 @@ import { authService } from '../services/auth.service';
 export default function Profile() {
   const { user, refreshProfile } = useAuth(); 
   
+  // State UI
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  // 1. State untuk File Gambar
+  // State untuk File Gambar
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
+  // State Form Data
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -26,6 +28,7 @@ export default function Profile() {
     website: ''
   });
 
+  // 1. Sync Data User ke Form saat pertama kali load
   useEffect(() => {
     if (user) {
       setFormData({
@@ -38,16 +41,17 @@ export default function Profile() {
         github: user.socials?.github || '',
         website: user.socials?.website || ''
       });
-      // Set preview awal dari data user yang sudah ada
+      // Set preview dari database jika ada
       setPhotoPreview(user.profilePicture || null);
     }
   }, [user]);
 
+  // Handle Input Teks Biasa
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 2. Handle Perubahan File (Upload Gambar)
+  // 2. Handle Ganti Foto (Validasi & Preview)
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
         const file = e.target.files[0];
@@ -55,20 +59,23 @@ export default function Profile() {
         // Validasi Ukuran (Max 2MB)
         if (file.size > 2 * 1024 * 1024) {
             setErrorMsg("Ukuran file terlalu besar! Maksimal 2MB.");
+            // Reset input file agar user bisa pilih ulang
+            e.target.value = "";
             return;
         }
 
         setPhotoFile(file);
         setPhotoPreview(URL.createObjectURL(file)); // Buat preview lokal
-        setErrorMsg(''); // Hapus error jika ada
+        setErrorMsg(''); // Reset error
     }
   };
 
-  // 3. Trigger klik pada input file tersembunyi
+  // Trigger klik input file yang tersembunyi
   const handleTriggerFile = () => {
     fileInputRef.current?.click();
   };
 
+  // 3. Handle Submit ke Backend
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -76,42 +83,42 @@ export default function Profile() {
     setErrorMsg('');
 
     try {
-      // 4. Gunakan FormData untuk mengirim File + Data Text
+      // Gunakan FormData karena ada file upload
       const payload = new FormData();
       
       payload.append('fullName', formData.fullName);
       payload.append('profession', formData.profession);
       payload.append('bio', formData.bio);
       
-      // Kirim skills sebagai array JSON string atau dipisah koma (Tergantung Backend Anda)
-      // Opsi 1 (Jika backend terima string lalu di-split):
-      // payload.append('skills', formData.skills); 
-      
-      // Opsi 2 (Jika backend terima array via FormData, kita kirim loop):
+      // Handle Skills (Split string jadi array)
       const skillArray = formData.skills.split(',').map(s => s.trim()).filter(s => s !== '');
       skillArray.forEach(skill => payload.append('skills[]', skill));
 
-      // Socials (Nested Object di FormData biasanya dikirim per key)
+      // Handle Socials
       payload.append('socials[linkedin]', formData.linkedin);
       payload.append('socials[github]', formData.github);
       payload.append('socials[website]', formData.website);
 
-      // 🔥 Kirim File Profil (Jika ada perubahan)
+      // Handle File Foto (Hanya kirim jika user memilih foto baru)
       if (photoFile) {
         payload.append('profilePicture', photoFile); 
       }
 
-      // Pastikan authService.updateProfile mendukung FormData!
+      // Kirim ke Service
       await authService.updateProfile(payload);
       
+      // Refresh Context Auth agar header/sidebar ikut update
       await refreshProfile(); 
 
       setSuccessMsg("Profil berhasil diperbarui!");
+      
+      // Scroll ke atas
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
     } catch (err: any) {
       console.error(err);
       setErrorMsg(err.response?.data?.message || 'Gagal mengupdate profil');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }
@@ -124,57 +131,52 @@ export default function Profile() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          {/* --- KOLOM KIRI (Kartu User) --- */}
+          {/* --- KOLOM KIRI (Kartu User & Foto) --- */}
           <div className="md:col-span-1">
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 text-center sticky top-24">
               
-              {/* AREA FOTO PROFIL DENGAN TOMBOL EDIT */}
-              <div className="relative w-32 h-32 mx-auto mb-4 group">
-                <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-md bg-gray-100">
+              {/* AREA FOTO PROFIL */}
+              <div className="relative w-32 h-32 mx-auto mb-6 group">
+                
+                {/* 1. Lingkaran Foto */}
+                <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-lg bg-gray-100">
                     <img 
                         src={photoPreview && photoPreview !== 'user.jpg' 
                             ? photoPreview 
-                            : `https://ui-avatars.com/api/?name=${user?.fullName || 'User'}&background=random`} 
+                            : `https://ui-avatars.com/api/?name=${user?.fullName || 'User'}&background=random&size=128`} 
                         alt="Profile" 
                         className="w-full h-full object-cover"
                     />
                 </div>
-                
-                {/* Overlay Tombol Edit saat Hover */}
+
+                {/* 2. Tombol Kamera (Selalu Terlihat) */}
                 <button 
                     type="button"
                     onClick={handleTriggerFile}
-                    className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    className="absolute bottom-0 right-0 bg-blue-600 text-white p-2.5 rounded-full shadow-md hover:bg-blue-700 transition-all transform hover:scale-110 border-2 border-white z-10 cursor-pointer"
+                    title="Ubah Foto Profil"
                 >
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
                 </button>
 
-                {/* Input File Tersembunyi */}
+                {/* 3. Input File Tersembunyi */}
                 <input 
                     type="file" 
                     ref={fileInputRef}
                     onChange={handleFileChange}
-                    accept="image/png, image/jpeg, image/jpg"
+                    accept="image/png, image/jpeg, image/jpg, image/webp"
                     className="hidden"
                 />
               </div>
-
-              <button 
-                type="button" 
-                onClick={handleTriggerFile}
-                className="text-xs text-primary font-bold hover:underline mb-4"
-              >
-                Ubah Foto Profil
-              </button>
               
               <h2 className="text-xl font-bold font-lexend text-gray-900">{user?.fullName}</h2>
               <p className="text-gray-500 text-sm mb-4">@{user?.username}</p>
               
-              <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase mb-6">
-                {user?.role}
+              <div className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full uppercase mb-6">
+                {user?.role || 'User'}
               </div>
 
               <div className="text-left border-t border-gray-100 pt-4 space-y-3">
@@ -200,13 +202,13 @@ export default function Profile() {
               </h3>
 
               {successMsg && (
-                <div className="mb-4 p-4 bg-green-50 text-green-600 rounded-lg border border-green-100 text-sm flex items-center">
-                  ✅ <span className="ml-2">{successMsg}</span>
+                <div className="mb-4 p-4 bg-green-50 text-green-600 rounded-lg border border-green-100 text-sm flex items-center animate-fade-in">
+                  ✅ <span className="ml-2 font-medium">{successMsg}</span>
                 </div>
               )}
               {errorMsg && (
-                <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100 text-sm">
-                  {errorMsg}
+                <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100 text-sm flex items-center animate-fade-in">
+                  ⚠️ <span className="ml-2 font-medium">{errorMsg}</span>
                 </div>
               )}
 
@@ -305,17 +307,38 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* Submit Button */}
-                <div className="pt-4 flex justify-end">
+                {/* --- TOMBOL SIMPAN (FIXED UI) --- */}
+                <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end items-center gap-4">
+                  
+                  {loading && <span className="text-sm text-gray-500 animate-pulse">Sedang menyimpan...</span>}
+
                   <button
                     type="submit"
                     disabled={loading}
                     className={`
-                      px-6 py-2.5 rounded-lg text-white font-medium font-lexend shadow-md transition-all
-                      ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark hover:shadow-lg'}
+                      flex items-center gap-2 px-8 py-3 rounded-xl text-white font-bold font-lexend shadow-lg transition-all
+                      ${loading 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-primary hover:bg-primary-dark hover:-translate-y-1 hover:shadow-xl'
+                      }
                     `}
                   >
-                    {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+                    {loading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Menyimpan...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Simpan Perubahan</span>
+                      </>
+                    )}
                   </button>
                 </div>
 
