@@ -8,22 +8,16 @@ export default () => {
     e.preventDefault();
 
     if (form.current) {
-      // Debug: Log form data
-      const formData = new FormData(form.current);
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
       emailjs
         .sendForm("service_57ry5ue", "template_mww4rpa", form.current, {
           publicKey: "5koMvTcCXsGQVjS5q",
         })
         .then(
           () => {
-            console.log("SUCCESS!");
+            // Email sent successfully
           },
           (error) => {
-            console.log("FAILED...", error.text);
+            console.error("Failed to send email:", error.text);
           },
         );
     }

@@ -1,16 +1,16 @@
-import { useState, type ChangeEvent } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Tambah useLocation
-import { jwtDecode } from 'jwt-decode'; // Tambah jwtDecode
-import { useAuth } from '../contexts/AuthContext';
-import { authService } from '../services/auth.service';
-import AuthLayout from '../components/templates/AuthLayout';
-import FormGroup from '../components/molecules/FormGroup';
-import Button from '../components/atoms/Button';
+import { useState, type ChangeEvent } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; // Tambah useLocation
+import { jwtDecode } from "jwt-decode"; // Tambah jwtDecode
+import { useAuth } from "../contexts/AuthContext";
+import { authService } from "../services/auth.service";
+import AuthLayout from "../components/templates/AuthLayout";
+import FormGroup from "../components/molecules/FormGroup";
+import Button from "../components/atoms/Button";
 
 // Definisi tipe token untuk TypeScript
 interface DecodedToken {
   id: string;
-  role: 'student' | 'mentor' | 'admin';
+  role: "student" | "mentor" | "admin";
   exp: number;
 }
 
@@ -18,83 +18,76 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation(); // Hook untuk membaca state history (redirect back)
   const { login } = useAuth();
-  
-  const [formData, setFormData] = useState({ identifier: '', password: '' });
-  const [error, setError] = useState<string>('');
+
+  const [formData, setFormData] = useState({ identifier: "", password: "" });
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       // 1. Panggil API
       const response = await authService.login({
-        identifier: formData.identifier, 
-        password: formData.password
+        identifier: formData.identifier,
+        password: formData.password,
       });
-
-      // 🔥 LOG BRUTAL: LIHAT INI DI CONSOLE BROWSER (F12)
-      console.log("📦 1. RESPONSE UTUH:", response);
-      console.log("📦 2. RESPONSE.DATA:", response?.data);
-      console.log("📦 3. RESPONSE.DATA.DATA:", response?.data?.data);
 
       // 2. LOGIKA PENCARI TOKEN (Cari sampai dapat)
       let token = null;
 
-      if (response?.data?.data && typeof response.data.data === 'string') {
-          // KEMUNGKINAN 1: Axios Standar (Paling Sering)
-          console.log("✅ Token ditemukan di: response.data.data");
-          token = response.data.data;
-      } 
-      else if (response?.data && typeof response.data === 'string') {
-          // KEMUNGKINAN 2: Response langsung string token (Jarang)
-          console.log("✅ Token ditemukan di: response.data");
-          token = response.data;
-      }
-      else if (response?.data?.token && typeof response.data.token === 'string') {
-          // KEMUNGKINAN 3: Backend kirim { token: "..." }
-          console.log("✅ Token ditemukan di: response.data.token");
-          token = response.data.token;
-      }
-      else if (response?.token && typeof response.token === 'string') {
-           // KEMUNGKINAN 4: Interceptor sudah kupas data
-           console.log("✅ Token ditemukan di: response.token");
-           token = response.token;
+      if (response?.data?.data && typeof response.data.data === "string") {
+        // KEMUNGKINAN 1: Axios Standar (Paling Sering)
+        token = response.data.data;
+      } else if (response?.data && typeof response.data === "string") {
+        // KEMUNGKINAN 2: Response langsung string token (Jarang)
+        token = response.data;
+      } else if (
+        response?.data?.token &&
+        typeof response.data.token === "string"
+      ) {
+        // KEMUNGKINAN 3: Backend kirim { token: "..." }
+        token = response.data.token;
+      } else if (response?.token && typeof response.token === "string") {
+        // KEMUNGKINAN 4: Interceptor sudah kupas data
+        token = response.token;
       }
 
       // 3. STOP!! JANGAN LANJUT KALAU TOKEN KOSONG
       if (!token) {
-        throw new Error("Token tidak ditemukan! Cek Console F12 untuk lihat struktur response.");
+        throw new Error(
+          "Token tidak ditemukan! Cek Console F12 untuk lihat struktur response.",
+        );
       }
 
       // 4. SIMPAN & DECODE (Sekarang aman karena token pasti ada isinya)
-      await login(token); 
+      await login(token);
       const decoded = jwtDecode<DecodedToken>(token);
-
-      console.log("🔓 Role User:", decoded.role); // Cek Role di Console
 
       // 5. REDIRECT
       const from = location.state?.from?.pathname;
       if (from) {
-          navigate(from, { replace: true });
+        navigate(from, { replace: true });
       } else {
-          if (decoded.role === 'mentor') {
-              navigate('/mentor/dashboard', { replace: true });
-          } else {
-              navigate('/dashboard', { replace: true });
-          }
+        if (decoded.role === "mentor") {
+          navigate("/mentor/dashboard", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
       }
-
     } catch (err: any) {
       console.error("❌ ERROR LOGIN:", err);
       // Tampilkan pesan error yang lebih jelas
-      const msg = err.message || err.response?.data?.message || "Terjadi kesalahan sistem.";
+      const msg =
+        err.message ||
+        err.response?.data?.message ||
+        "Terjadi kesalahan sistem.";
       setError(msg);
     } finally {
       setLoading(false);
@@ -112,7 +105,11 @@ const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
       {error && (
         <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm border border-red-100 flex items-center">
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
           </svg>
           {error}
         </div>

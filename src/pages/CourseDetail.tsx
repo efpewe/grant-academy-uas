@@ -60,19 +60,12 @@ export default function CourseDetail() {
     try {
       setProcessing(true);
 
-      console.log("📝 Creating transaction for course:", course._id);
       const result = await transactionService.checkout(course._id);
-
-      console.log("✅ Transaction API Response:", result);
-      console.log("📦 Result.data:", result.data);
 
       // Handle both possible response structures
       // Backend returns: { message, data: {...transaction} }
       // After axios, result = { message, data: {...transaction} }
       const transactionData = result.data || result;
-      console.log("💰 Transaction Data:", transactionData);
-      console.log("🔑 Transaction ID:", transactionData._id);
-      console.log("🎫 Snap Token:", transactionData.snapToken);
 
       // PENTING: Refresh profile agar data 'enrolledCourses' di context terupdate
       await refreshProfile();
@@ -85,10 +78,6 @@ export default function CourseDetail() {
         navigate("/transactions");
       } else {
         // --- KELAS BERBAYAR ---
-        console.log(
-          "🔀 Navigating to payment page with ID:",
-          transactionData._id,
-        );
         // Arahkan ke halaman Payment dengan membawa ID Transaksi
         navigate(`/payment/${transactionData._id}`, {
           state: { transactionData: transactionData },

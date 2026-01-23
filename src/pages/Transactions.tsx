@@ -29,22 +29,13 @@ export default function Transactions() {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      console.log("🔍 Fetching user transactions...");
 
       const response = await transactionService.getMyTransactions();
-      console.log("📊 Transactions API Response:", response);
-      console.log("📦 Response.data:", response.data);
 
       // Pastikan mengakses response.data.data jika struktur backend Anda { data: [...] }
       // Atau response.data jika langsung array. Sesuaikan dengan controller Anda.
       // Berdasarkan controller sebelumnya: res.status(200).json({ data: transactions })
       const transactions = response.data.data || response.data || [];
-      console.log("✅ Parsed Transactions:", transactions);
-      console.log("📈 Total transactions found:", transactions.length);
-
-      if (transactions.length > 0) {
-        console.log("📋 First transaction:", transactions[0]);
-      }
 
       setTransactions(transactions);
     } catch (err) {

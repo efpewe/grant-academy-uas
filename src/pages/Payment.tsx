@@ -48,13 +48,11 @@ export default function PaymentPage() {
     // Panggil Snap Midtrans
     if (window.snap) {
       window.snap.pay(transaction.snapToken, {
-        onSuccess: (result: any) => {
-          console.log("Success Result:", result);
+        onSuccess: () => {
           alert("Pembayaran Berhasil!");
           navigate("/my-courses");
         },
-        onPending: (result: any) => {
-          console.log("Pending Result:", result);
+        onPending: () => {
           alert("Menunggu pembayaran...");
           navigate("/transactions");
         },
@@ -63,9 +61,7 @@ export default function PaymentPage() {
           alert("Pembayaran Gagal.");
         },
         onClose: () => {
-          console.log(
-            "Customer closed the popup without finishing the payment",
-          );
+          // User closed popup without finishing payment
         },
       });
     } else {
