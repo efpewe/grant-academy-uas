@@ -22,6 +22,6 @@ export const authService = {
   },
 
   updateProfile(payload: FormData | any) {
-    return api.put("/users/profile", payload);
+    return api.put("/auth/profile", payload);
   },
 };
