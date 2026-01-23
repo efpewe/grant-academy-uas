@@ -1,6 +1,6 @@
 import api from '../utils/api';
 
-// 1. Export Interface 'Lesson' (Wajib ada export)
+// 1. Export Interface
 export interface Lesson {
   _id: string;
   title: string;
@@ -32,28 +32,34 @@ export interface Course {
   lessons: Lesson[]; 
 }
 
+// Interface untuk Response API (Opsional, agar lebih rapi)
+interface ApiResponse<T> {
+    message: string;
+    data: T;
+}
+
 export const courseService = {
   // Get All Courses
-  async getAllCourses() {
+  async getAllCourses(): Promise<ApiResponse<Course[]>> {
     const response = await api.get('/courses');
     return response.data; 
   },
 
   // Get Single Course by Slug
-  async getCourseBySlug(slug: string) {
+  async getCourseBySlug(slug: string): Promise<ApiResponse<Course>> {
     const response = await api.get(`/courses/${slug}`);
     return response.data;
   },
-  async createCourse(formData: FormData) {
-    const response = await api.post('/courses', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data', // Wajib untuk upload file
-      },
-    });
+
+  // Create Course (Upload File)
+  async createCourse(formData: FormData): Promise<ApiResponse<Course>> {
+    // ✅ PERBAIKAN: Hapus headers manual. Biarkan Axios mengaturnya otomatis.
+    const response = await api.post('/courses', formData);
     return response.data;
   },
-  async addLesson(courseId: string, data: any) {
-    // Kita kirim JSON biasa
+
+  // Add Lesson
+  async addLesson(courseId: string, data: { title: string; content: string; videoUrl: string; isFree: boolean }): Promise<ApiResponse<Lesson>> {
     const response = await api.post(`/courses/${courseId}/lessons`, data);
     return response.data;
   },
