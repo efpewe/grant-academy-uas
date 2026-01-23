@@ -23,12 +23,8 @@ export default function CourseDetail() {
         if (slug) {
           const result = await courseService.getCourseBySlug(slug);
 
-          // Logic Unwrapping Data (Jaga-jaga struktur response beda)
-          if (result && result.data) {
-            setCourse(result.data);
-          } else {
-            setCourse(result);
-          }
+          // Extract data from ApiResponse<Course>
+          setCourse(result.data);
         }
       } catch (error) {
         console.error("❌ Gagal memuat kursus:", error);
