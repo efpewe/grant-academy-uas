@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from 'react';
 import DashboardLayout from '../components/templates/DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/auth.service';
@@ -9,6 +9,11 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+
+  // 1. State untuk File Gambar
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -33,42 +38,75 @@ export default function Profile() {
         github: user.socials?.github || '',
         website: user.socials?.website || ''
       });
+      // Set preview awal dari data user yang sudah ada
+      setPhotoPreview(user.profilePicture || null);
     }
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 2. Handle Perubahan File (Upload Gambar)
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+
+        // Validasi Ukuran (Max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            setErrorMsg("Ukuran file terlalu besar! Maksimal 2MB.");
+            return;
+        }
+
+        setPhotoFile(file);
+        setPhotoPreview(URL.createObjectURL(file)); // Buat preview lokal
+        setErrorMsg(''); // Hapus error jika ada
+    }
+  };
+
+  // 3. Trigger klik pada input file tersembunyi
+  const handleTriggerFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSuccessMsg('');
     setErrorMsg('');
 
     try {
-      const payload = {
-        fullName: formData.fullName,
-        profession: formData.profession,
-        bio: formData.bio,
-        skills: formData.skills.split(',').map(s => s.trim()).filter(s => s !== ''),
-        socials: {
-          linkedin: formData.linkedin,
-          github: formData.github,
-          website: formData.website
-        }
-      };
+      // 4. Gunakan FormData untuk mengirim File + Data Text
+      const payload = new FormData();
+      
+      payload.append('fullName', formData.fullName);
+      payload.append('profession', formData.profession);
+      payload.append('bio', formData.bio);
+      
+      // Kirim skills sebagai array JSON string atau dipisah koma (Tergantung Backend Anda)
+      // Opsi 1 (Jika backend terima string lalu di-split):
+      // payload.append('skills', formData.skills); 
+      
+      // Opsi 2 (Jika backend terima array via FormData, kita kirim loop):
+      const skillArray = formData.skills.split(',').map(s => s.trim()).filter(s => s !== '');
+      skillArray.forEach(skill => payload.append('skills[]', skill));
 
-      // PERBAIKAN 2: Hapus 'const response =' karena tidak dipakai
+      // Socials (Nested Object di FormData biasanya dikirim per key)
+      payload.append('socials[linkedin]', formData.linkedin);
+      payload.append('socials[github]', formData.github);
+      payload.append('socials[website]', formData.website);
+
+      // 🔥 Kirim File Profil (Jika ada perubahan)
+      if (photoFile) {
+        payload.append('profilePicture', photoFile); 
+      }
+
+      // Pastikan authService.updateProfile mendukung FormData!
       await authService.updateProfile(payload);
       
-      // PERBAIKAN 3: Gunakan refreshProfile() agar update instant tanpa reload browser
       await refreshProfile(); 
 
       setSuccessMsg("Profil berhasil diperbarui!");
-      // window.location.reload(); // Hapus ini karena sudah pakai refreshProfile
-      
-      // Scroll ke atas agar pesan sukses terlihat (opsional)
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
     } catch (err: any) {
@@ -89,15 +127,49 @@ export default function Profile() {
           {/* --- KOLOM KIRI (Kartu User) --- */}
           <div className="md:col-span-1">
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 text-center sticky top-24">
-              <div className="w-32 h-32 mx-auto bg-gray-100 rounded-full overflow-hidden mb-4 border-4 border-white shadow-md">
-                <img 
-                  src={user?.profilePicture && user.profilePicture !== 'user.jpg' 
-                    ? user.profilePicture 
-                    : `https://ui-avatars.com/api/?name=${user?.fullName}&background=random`} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
+              
+              {/* AREA FOTO PROFIL DENGAN TOMBOL EDIT */}
+              <div className="relative w-32 h-32 mx-auto mb-4 group">
+                <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-md bg-gray-100">
+                    <img 
+                        src={photoPreview && photoPreview !== 'user.jpg' 
+                            ? photoPreview 
+                            : `https://ui-avatars.com/api/?name=${user?.fullName || 'User'}&background=random`} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+                
+                {/* Overlay Tombol Edit saat Hover */}
+                <button 
+                    type="button"
+                    onClick={handleTriggerFile}
+                    className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </button>
+
+                {/* Input File Tersembunyi */}
+                <input 
+                    type="file" 
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/png, image/jpeg, image/jpg"
+                    className="hidden"
                 />
               </div>
+
+              <button 
+                type="button" 
+                onClick={handleTriggerFile}
+                className="text-xs text-primary font-bold hover:underline mb-4"
+              >
+                Ubah Foto Profil
+              </button>
+              
               <h2 className="text-xl font-bold font-lexend text-gray-900">{user?.fullName}</h2>
               <p className="text-gray-500 text-sm mb-4">@{user?.username}</p>
               
