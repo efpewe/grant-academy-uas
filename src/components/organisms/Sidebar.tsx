@@ -42,7 +42,7 @@ export default function Sidebar() {
       {/* 1. AREA LOGO */}
       <div className="h-20 flex items-center px-8 border-b border-gray-100">
         <Link to="/" className="text-2xl font-bold font-lexend text-gray-900">
-          <img className="w-20 h-20" src={logo} alt="logo" />
+          <img className="w-[200px]" src={logo} alt="logo" />
         </Link>
       </div>
 
