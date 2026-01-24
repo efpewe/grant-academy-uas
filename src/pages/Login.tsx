@@ -1,13 +1,12 @@
 import { useState, type ChangeEvent } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Tambah useLocation
-import { jwtDecode } from "jwt-decode"; // Tambah jwtDecode
+import { useNavigate, useLocation } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../contexts/AuthContext";
 import { authService } from "../services/auth.service";
 import AuthLayout from "../components/templates/AuthLayout";
 import FormGroup from "../components/molecules/FormGroup";
 import Button from "../components/atoms/Button";
 
-// Definisi tipe token untuk TypeScript
 interface DecodedToken {
   id: string;
   role: "student" | "mentor" | "admin";
@@ -16,7 +15,7 @@ interface DecodedToken {
 
 export default function Login() {
   const navigate = useNavigate();
-  const location = useLocation(); // Hook untuk membaca state history (redirect back)
+  const location = useLocation();
   const { login } = useAuth();
 
   const [formData, setFormData] = useState({ identifier: "", password: "" });
@@ -33,44 +32,35 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. Panggil API
       const response = await authService.login({
         identifier: formData.identifier,
         password: formData.password,
       });
 
-      // 2. LOGIKA PENCARI TOKEN (Cari sampai dapat)
       let token = null;
 
       if (response?.data?.data && typeof response.data.data === "string") {
-        // KEMUNGKINAN 1: Axios Standar (Paling Sering)
         token = response.data.data;
       } else if (response?.data && typeof response.data === "string") {
-        // KEMUNGKINAN 2: Response langsung string token (Jarang)
         token = response.data;
       } else if (
         response?.data?.token &&
         typeof response.data.token === "string"
       ) {
-        // KEMUNGKINAN 3: Backend kirim { token: "..." }
         token = response.data.token;
       } else if (response?.token && typeof response.token === "string") {
-        // KEMUNGKINAN 4: Interceptor sudah kupas data
         token = response.token;
       }
 
-      // 3. STOP!! JANGAN LANJUT KALAU TOKEN KOSONG
       if (!token) {
         throw new Error(
           "Token tidak ditemukan! Cek Console F12 untuk lihat struktur response.",
         );
       }
 
-      // 4. SIMPAN & DECODE (Sekarang aman karena token pasti ada isinya)
       await login(token);
       const decoded = jwtDecode<DecodedToken>(token);
 
-      // 5. REDIRECT
       const from = location.state?.from?.pathname;
       if (from) {
         navigate(from, { replace: true });
@@ -83,7 +73,6 @@ export default function Login() {
       }
     } catch (err: any) {
       console.error("❌ ERROR LOGIN:", err);
-      // Tampilkan pesan error yang lebih jelas
       const msg =
         err.message ||
         err.response?.data?.message ||

@@ -1,17 +1,16 @@
-import api from '../utils/api';
+import api from "../utils/api";
 
 export const transactionService = {
   async checkout(courseId: string) {
-    const response = await api.post('/transactions', { courseId });
+    const response = await api.post("/transactions", { courseId });
     return response.data;
   },
 
   async getMyTransactions() {
-    const response = await api.get('/transactions/my-transactions');
+    const response = await api.get("/transactions/my-transactions");
     return response.data;
   },
-  
-  // (Opsional) Untuk mengambil detail transaksi di halaman payment nanti
+
   async getTransactionDetail(transactionId: string) {
     const response = await api.get(`/transactions/${transactionId}`);
     return response.data;

@@ -5,7 +5,6 @@ export default function Sidebar() {
   const { pathname } = useLocation();
   const { logout, user } = useAuth();
 
-  // Helper untuk cek menu aktif
   const isActive = (path: string) => pathname === path;
 
   // --- DEFINISI MENU ---
@@ -17,21 +16,16 @@ export default function Sidebar() {
     { name: "Transaksi", path: "/transactions", icon: "💳" },
   ];
 
-  // 2. Menu Khusus Mentor
   const mentorMenus = [
     { name: "Studio Creator", path: "/mentor/dashboard", icon: "📊" },
     { name: "Buat Kursus", path: "/mentor/create-course", icon: "✍️" },
-    // Mentor juga boleh intip marketplace
     { name: "Lihat Marketplace", path: "/dashboard", icon: "🔍" },
   ];
 
-  // 3. Menu Umum (Selalu muncul di paling bawah)
   const commonMenus = [
     { name: "Pengaturan Profil", path: "/profile", icon: "⚙️" },
   ];
 
-  // --- LOGIC PEMILIHAN MENU ---
-  // Jika role mentor, pakai mentorMenus. Jika student/lainnya, pakai studentMenus.
   const menus = [
     ...(user?.role === "mentor" ? mentorMenus : studentMenus),
     ...commonMenus,
@@ -39,17 +33,14 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 flex flex-col z-50 transition-all">
-      {/* 1. AREA LOGO */}
       <div className="h-20 flex items-center px-8 border-b border-gray-100">
         <Link to="/" className="text-2xl font-bold font-lexend text-gray-900">
           <img className="w-[200px]" src={logo} alt="logo" />
         </Link>
       </div>
 
-      {/* 2. AREA USER PROFILE (MINI) */}
       <div className="p-6 pb-2">
         <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-          {/* Tampilkan foto profil dari database jika ada, jika tidak gunakan inisial */}
           {user?.profilePicture ? (
             <img
               src={user.profilePicture}
@@ -58,7 +49,6 @@ export default function Sidebar() {
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shadow-sm">
-              {/* Ambil inisial nama depan */}
               {user?.fullName?.charAt(0).toUpperCase() || "U"}
             </div>
           )}
@@ -79,7 +69,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* 3. MENU NAVIGATION */}
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scrollbar">
         <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-lexend">
           Menu Utama
@@ -104,7 +93,6 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* 4. LOGOUT BUTTON */}
       <div className="p-4 border-t border-gray-100">
         <button
           onClick={logout}

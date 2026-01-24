@@ -9,7 +9,6 @@ export default () => {
     { label: "About", path: "/about" },
     { label: "Course", path: "/course" },
     { label: "News", path: "/news" },
-    { label: "Subscribe", path: "/subscribe" },
     { label: "Contact", path: "/contact" },
   ];
   const socialLinks = [

@@ -3,16 +3,13 @@ import { type Course } from "../../services/course.service";
 
 interface CourseCardProps {
   course: Course;
-  href?: string; // Opsional: Custom Link
-  ctaText?: string; // Opsional: Custom Text Tombol
+  href?: string;
+  ctaText?: string;
 }
 
 export default function CourseCard({ course, href, ctaText }: CourseCardProps) {
-  // Logic: Jika ada href custom (misal dari MyCourses), pakai itu.
-  // Jika tidak, default ke halaman detail (/course/slug).
   const linkTarget = href ? href : course.slug ? `/course/${course.slug}` : "#";
 
-  // Format Rupiah
   const formatPrice = (price: number) => {
     return price === 0
       ? "Gratis"
@@ -28,7 +25,6 @@ export default function CourseCard({ course, href, ctaText }: CourseCardProps) {
       to={linkTarget}
       className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group border border-gray-100 h-full flex flex-col"
     >
-      {/* Thumbnail */}
       <div className="relative aspect-video overflow-hidden">
         <img
           src={course.thumbnail}
@@ -40,7 +36,6 @@ export default function CourseCard({ course, href, ctaText }: CourseCardProps) {
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-5 flex flex-col flex-1">
         <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
           {course.title}
@@ -48,7 +43,6 @@ export default function CourseCard({ course, href, ctaText }: CourseCardProps) {
 
         <div className="flex items-center gap-2 mb-4 mt-auto">
           <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
-            {/* Avatar placeholder */}
             <img
               src={`https://ui-avatars.com/api/?name=${course.mentor?.fullName}&background=random`}
               alt=""
@@ -64,7 +58,7 @@ export default function CourseCard({ course, href, ctaText }: CourseCardProps) {
             {formatPrice(course.price)}
           </span>
           <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
-            {ctaText || "Lihat Detail"} {/* Teks dinamis */}
+            {ctaText || "Lihat Detail"}
           </span>
         </div>
       </div>

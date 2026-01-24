@@ -2,14 +2,13 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/templates/DashboardLayout";
 import { courseService } from "../../services/course.service";
-import { AxiosError } from "axios"; // Import untuk handling error
+import { AxiosError } from "axios";
 
 export default function CreateCourse() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
-  // State Form
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -26,19 +25,16 @@ export default function CreateCourse() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // ✅ UPDATE: Handle File dengan Validasi Size
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
-      // 1. Validasi Ukuran (Max 2MB) sesuai limit Backend
       if (file.size > 2 * 1024 * 1024) {
         alert("Ukuran file terlalu besar! Maksimal 2MB.");
-        e.target.value = ""; // Reset input
+        e.target.value = "";
         return;
       }
 
-      // 2. Validasi Tipe (Opsional, meski accept sudah memfilter)
       if (!file.type.startsWith("image/")) {
         alert("File harus berupa gambar!");
         return;
@@ -54,7 +50,6 @@ export default function CreateCourse() {
     setLoading(true);
 
     try {
-      // 1. Siapkan FormData
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("description", formData.description);
@@ -62,12 +57,10 @@ export default function CreateCourse() {
       payload.append("level", formData.level);
       payload.append("category", formData.category);
 
-      // 'thumbnail' harus sesuai dengan upload.single('thumbnail') di backend
       if (formData.thumbnail) {
         payload.append("thumbnail", formData.thumbnail);
       }
 
-      // 2. Kirim ke Backend
       await courseService.createCourse(payload);
 
       alert("Kursus berhasil dibuat!");
@@ -75,7 +68,6 @@ export default function CreateCourse() {
     } catch (error) {
       console.error(error);
 
-      // ✅ UPDATE: Error Handling yang lebih detail
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message || "Gagal membuat kursus";
         alert(`Error: ${message}`);
@@ -90,7 +82,6 @@ export default function CreateCourse() {
   return (
     <DashboardLayout>
       <div className="max-w-3xl mx-auto pb-10">
-        {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold font-lexend text-gray-900">
@@ -112,7 +103,6 @@ export default function CreateCourse() {
           onSubmit={handleSubmit}
           className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6"
         >
-          {/* Judul Kursus */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Judul Kursus <span className="text-red-500">*</span>
@@ -128,7 +118,6 @@ export default function CreateCourse() {
             />
           </div>
 
-          {/* Grid Kategori & Level */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -198,7 +187,6 @@ export default function CreateCourse() {
             </div>
           </div>
 
-          {/* Deskripsi */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Deskripsi <span className="text-red-500">*</span>
@@ -214,7 +202,6 @@ export default function CreateCourse() {
             />
           </div>
 
-          {/* Harga */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Harga (Rp)
@@ -244,14 +231,12 @@ export default function CreateCourse() {
             </div>
           </div>
 
-          {/* Upload Thumbnail */}
           <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
             <label className="block text-sm font-bold text-gray-700 mb-3">
               Thumbnail Kursus <span className="text-red-500">*</span>
             </label>
 
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              {/* Preview Image */}
               <div className="w-full sm:w-48 h-32 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm flex items-center justify-center shrink-0 relative group">
                 {preview ? (
                   <>
@@ -286,7 +271,6 @@ export default function CreateCourse() {
                 )}
               </div>
 
-              {/* Input File */}
               <div className="flex-1 w-full">
                 <input
                   type="file"
@@ -310,7 +294,6 @@ export default function CreateCourse() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="pt-6 border-t border-gray-100 flex justify-end gap-3">
             <button
               type="button"

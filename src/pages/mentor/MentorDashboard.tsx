@@ -11,14 +11,11 @@ export default function MentorDashboard() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // FETCH COURSES
   useEffect(() => {
     const fetchMyCourses = async () => {
       try {
         const response = await courseService.getAllCourses();
 
-        // FILTER: Ambil hanya kursus milik mentor yang sedang login
-        // Kita cek dua kemungkinan: mentor berupa object (populated) atau string ID
         const myCourses = response.data.filter((c: any) => {
           const mentorId = c.mentor?._id || c.mentor;
           return mentorId === user?._id;
@@ -37,7 +34,6 @@ export default function MentorDashboard() {
     }
   }, [user]);
 
-  // Format Rupiah
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -64,7 +60,6 @@ export default function MentorDashboard() {
         </Link>
       </div>
 
-      {/* --- STATS CARDS (DUMMY DATA) --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
           <div className="text-gray-500 text-sm font-medium mb-1">
@@ -88,7 +83,6 @@ export default function MentorDashboard() {
         </div>
       </div>
 
-      {/* --- TABLE MANAGEMENT --- */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <h3 className="font-bold text-lg font-lexend">Daftar Kursus Saya</h3>
@@ -150,7 +144,6 @@ export default function MentorDashboard() {
                       </span>
                     </td>
                     <td className="p-5 text-right space-x-2">
-                      {/* TOMBOL TAMBAH MATERI */}
                       <button
                         onClick={() =>
                           navigate(`/mentor/course/${course._id}/add-lesson`)
@@ -160,7 +153,6 @@ export default function MentorDashboard() {
                         + Materi
                       </button>
 
-                      {/* TOMBOL EDIT & HAPUS */}
                       <button className="text-blue-600 hover:underline font-medium text-sm">
                         Edit
                       </button>

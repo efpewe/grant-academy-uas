@@ -13,25 +13,18 @@ export default function MyCourses() {
   useEffect(() => {
     const fetchMyClasses = async () => {
       try {
-        // 1. Ambil data transaksi user
         const result = await transactionService.getMyTransactions();
         const transactions = result.data || [];
 
-        // 2. Filter & Extract Data
         const myPurchasedCourses = transactions
-          // Hanya ambil transaksi yang SUKSES (Settlement) atau GRATIS (Capture/Success)
           .filter(
             (trx: any) =>
               trx.status === "settlement" ||
               trx.status === "success" ||
               trx.status === "capture",
           )
-          // Ambil object course dari dalam transaksi
           .map((trx: any) => trx.course)
-          // Hapus data null (jika kursus sudah dihapus admin tapi transaksi masih ada)
           .filter((course: any) => course !== null);
-        // 3. Hapus Duplikat
-        // (Jaga-jaga jika user tidak sengaja beli kursus yang sama 2x sebelum validasi dipasang)
         const uniqueCourses = Array.from(
           new Map(myPurchasedCourses.map((c: any) => [c._id, c])).values(),
         ) as Course[];
@@ -49,7 +42,6 @@ export default function MyCourses() {
 
   return (
     <DashboardLayout>
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold font-lexend text-gray-900">
@@ -66,9 +58,7 @@ export default function MyCourses() {
         </Link>
       </div>
 
-      {/* Content Section */}
       {loading ? (
-        // Loading State
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
             <div
@@ -78,7 +68,6 @@ export default function MyCourses() {
           ))}
         </div>
       ) : courses.length > 0 ? (
-        // Data State: Grid Kartu Kursus
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (
             <CourseCard
@@ -90,7 +79,6 @@ export default function MyCourses() {
           ))}
         </div>
       ) : (
-        // Empty State
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
           <div className="w-20 h-20 bg-blue-50 text-primary rounded-full flex items-center justify-center mb-6 text-4xl shadow-sm">
             📚
@@ -103,7 +91,7 @@ export default function MyCourses() {
             belajar skill baru hari ini!
           </p>
           <Link to="/dashboard">
-            <Button className="px-8 py-3 bg-white text-primary border border-primary hover:bg-blue-50">
+            <Button className="px-8 py-3 bg-primary text-white border border-primary hover:bg-primary/80">
               Jelajahi Katalog Kelas
             </Button>
           </Link>

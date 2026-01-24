@@ -13,9 +13,7 @@ export default () => {
           publicKey: "5koMvTcCXsGQVjS5q",
         })
         .then(
-          () => {
-            // Email sent successfully
-          },
+          () => {},
           (error) => {
             console.error("Failed to send email:", error.text);
           },

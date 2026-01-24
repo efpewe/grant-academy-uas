@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../components/templates/DashboardLayout";
 import { transactionService } from "../services/transaction.service";
 
-// Definisikan tipe data sesuai respon backend
 interface Transaction {
   _id: string;
   orderId: string;
   amount: number;
   status: "pending" | "success" | "failed" | "challenge";
-  snapToken?: string; // Token untuk lanjut bayar jika pending
+  snapToken?: string;
   createdAt: string;
   course: {
     title: string;
@@ -32,9 +31,6 @@ export default function Transactions() {
 
       const response = await transactionService.getMyTransactions();
 
-      // Pastikan mengakses response.data.data jika struktur backend Anda { data: [...] }
-      // Atau response.data jika langsung array. Sesuaikan dengan controller Anda.
-      // Berdasarkan controller sebelumnya: res.status(200).json({ data: transactions })
       const transactions = response.data.data || response.data || [];
 
       setTransactions(transactions);
@@ -46,7 +42,6 @@ export default function Transactions() {
     }
   };
 
-  // Helper: Format Rupiah
   const formatIDR = (price: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -55,7 +50,6 @@ export default function Transactions() {
     }).format(price);
   };
 
-  // Helper: Format Tanggal
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
       day: "numeric",
@@ -66,7 +60,6 @@ export default function Transactions() {
     });
   };
 
-  // Helper: Warna Status
   const getStatusColor = (status: string) => {
     switch (status) {
       case "success":
@@ -83,13 +76,12 @@ export default function Transactions() {
     }
   };
 
-  // Fungsi Lanjut Bayar (Jika user menutup popup sebelumnya)
   const handleContinuePayment = (snapToken: string) => {
     if (window.snap) {
       window.snap.pay(snapToken, {
         onSuccess: () => {
           alert("Pembayaran Berhasil!");
-          fetchTransactions(); // Refresh data
+          fetchTransactions();
         },
         onPending: () => alert("Menunggu pembayaran..."),
         onError: () => alert("Pembayaran gagal!"),
@@ -113,19 +105,16 @@ export default function Transactions() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Loading State */}
         {loading && (
           <div className="p-8 text-center text-gray-500">
             Memuat data transaksi...
           </div>
         )}
 
-        {/* Error State */}
         {!loading && error && (
           <div className="p-8 text-center text-red-500">{error}</div>
         )}
 
-        {/* Table Data */}
         {!loading && !error && (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-600">
