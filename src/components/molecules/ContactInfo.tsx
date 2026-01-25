@@ -9,13 +9,13 @@ export default () => {
       </p>
       <ul className="list-none space-y-[15px]">
         <li className="text-[16px] text-dark font-inter">
-          <strong className="text-primary mr-[5px]">Email:</strong> info@grantacademy.com
+          <strong className="text-primary mr-[5px]">Email:</strong> grantacademy@gmail.com
         </li>
         <li className="text-[16px] text-dark font-inter">
           <strong className="text-primary mr-[5px]">Telepon:</strong> +62 123 456 789
         </li>
         <li className="text-[16px] text-dark font-inter">
-          <strong className="text-primary mr-[5px]">Alamat:</strong> Jl. Edukasi No. 10, Jakarta, Indonesia
+          <strong className="text-primary mr-[5px]">Alamat:</strong> Jl. Edukasi No. 10, Medan, Sumatera Utara, Indonesia
         </li>
       </ul>
     </div>
