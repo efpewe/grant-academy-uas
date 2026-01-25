@@ -73,10 +73,31 @@ export default function Sidebar() {
         `}
       >
         {/* Logo Section */}
-        <div className="h-20 flex items-center justify-center px-4 border-b border-gray-100">
+        <div className="h-20 flex items-center justify-between px-4 border-b border-gray-100">
           <Link to="/" className="text-2xl font-bold font-lexend text-gray-900">
             <img className="w-[180px]" src={logo} alt="logo" />
           </Link>
+
+          {/* Close Button (Mobile Only) */}
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close sidebar"
+          >
+            <svg
+              className="w-6 h-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
         {/* User Profile */}
