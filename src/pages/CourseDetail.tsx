@@ -10,7 +10,7 @@ import { useModal } from "../contexts/ModalContext";
 export default function CourseDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const location = useLocation(); // Hook untuk menyimpan history url saat ini
+  const location = useLocation();
   const { user, isAuthenticated, hasPurchased, refreshProfile } = useAuth();
   const { showAlert } = useModal();
 
@@ -18,14 +18,12 @@ export default function CourseDetail() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
 
-  // 1. FETCH DATA COURSE
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         if (slug) {
           const result = await courseService.getCourseBySlug(slug);
 
-          // Extract data from ApiResponse<Course>
           setCourse(result.data);
         }
       } catch (error) {
@@ -37,7 +35,6 @@ export default function CourseDetail() {
     fetchCourse();
   }, [slug]);
 
-  // 2. FORMAT RUPIAH
   const formatPrice = (price: number) => {
     return price === 0
       ? "Gratis"
@@ -48,11 +45,8 @@ export default function CourseDetail() {
         }).format(price);
   };
 
-  // 3. LOGIC PENDAFTARAN (CORE LOGIC)
   const handleEnroll = async () => {
-    // Skenario A: Belum Login
     if (!isAuthenticated || !user) {
-      // Redirect ke login, bawa state 'from' agar nanti bisa balik lagi kesini
       navigate("/login", { state: { from: location } });
       return;
     }
@@ -64,29 +58,18 @@ export default function CourseDetail() {
 
       const result = await transactionService.checkout(course._id);
 
-      // Handle both possible response structures
-      // Backend returns: { message, data: {...transaction} }
-      // After axios, result = { message, data: {...transaction} }
       const transactionData = result.data || result;
-
-      // PENTING: Refresh profile agar data 'enrolledCourses' di context terupdate
       await refreshProfile();
 
-      // Skenario B: Logic Pemisah Gratis vs Bayar
       if (course.price === 0) {
-        // --- KELAS GRATIS ---
         alert("Berhasil mendaftar kelas gratis!");
-        // Arahkan ke halaman user, misalnya Transaksi atau Kelas Saya
         navigate("/transactions");
       } else {
-        // --- KELAS BERBAYAR ---
-        // Arahkan ke halaman Payment dengan membawa ID Transaksi
         navigate(`/payment/${transactionData._id}`, {
           state: { transactionData: transactionData },
         });
       }
     } catch (error: any) {
-      // Handle Error (Misal user sudah punya kursus)
       console.error("❌ Checkout Error:", error);
       console.error("📄 Error Response:", error.response?.data);
 
@@ -107,8 +90,6 @@ export default function CourseDetail() {
     }
   };
 
-  // --- RENDERING ---
-
   if (loading)
     return (
       <MainLayout>
@@ -119,7 +100,7 @@ export default function CourseDetail() {
   if (!course) {
     return (
       <MainLayout>
-        <div className="container py-20 text-center">
+        <div className="w-[90%] max-w-[1140px] mx-auto py-20 text-center">
           <h2 className="text-2xl font-bold">Kursus tidak ditemukan</h2>
           <p className="text-gray-500 mb-4">Slug: {slug}</p>
           <button
@@ -133,15 +114,12 @@ export default function CourseDetail() {
     );
   }
 
-  // Cek Status Pembelian (Untuk ubah tombol jadi 'Lanjut Belajar')
-  // Kita handle kemungkinan course._id bertipe object atau string
   const isOwned = user ? hasPurchased(course._id) : false;
 
   return (
     <MainLayout>
-      {/* HEADER SECTION */}
       <section className="bg-[#f9f9f9] text-center pt-16 pb-20 px-4">
-        <div className="container mx-auto flex flex-col items-center max-w-4xl">
+        <div className="w-[90%] max-w-[1140px] mx-auto mx-auto flex flex-col items-center max-w-4xl">
           <Badge text={course.category} />
           <h1 className="text-3xl md:text-5xl font-bold font-lexend mt-4 mb-4 text-gray-900 leading-tight">
             {course.title}
@@ -160,7 +138,6 @@ export default function CourseDetail() {
         </div>
       </section>
 
-      {/* CONTENT SECTION */}
       <section className="pb-20 -mt-10 px-4">
         <div className="max-w-200 mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-2xl font-bold font-lexend mb-4">Deskripsi</h2>
@@ -168,7 +145,6 @@ export default function CourseDetail() {
             {course.description}
           </p>
 
-          {/* List Materi */}
           {course.lessons && course.lessons.length > 0 && (
             <div className="mb-8 p-6 bg-gray-50 rounded-xl">
               <h3 className="font-bold mb-4">Materi yang akan dipelajari:</h3>
@@ -186,7 +162,6 @@ export default function CourseDetail() {
             </div>
           )}
 
-          {/* ACTION FOOTER */}
           <div className="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-gray-100 gap-4">
             <div className="text-center md:text-left">
               <p className="text-sm text-gray-400 font-lexend">

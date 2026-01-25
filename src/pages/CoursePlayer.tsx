@@ -9,7 +9,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { useModal } from "../contexts/ModalContext";
 
 export default function CoursePlayer() {
-  // Tangkap DUA parameter dari URL
   const { courseSlug, lessonSlug } = useParams<{
     courseSlug: string;
     lessonSlug?: string;
@@ -22,14 +21,11 @@ export default function CoursePlayer() {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 1. FETCH COURSE & CHECK ACCESS
   useEffect(() => {
     const initCourse = async () => {
       try {
         if (!courseSlug) return;
 
-        // Cek apakah data course sudah ada di state (Optimization agar tidak fetch ulang saat ganti materi)
-        // Kita hanya fetch jika course belum ada atau slug course berbeda
         if (!course || course.slug !== courseSlug) {
           const result = await courseService.getCourseBySlug(courseSlug);
           const courseData = result.data || result;
@@ -50,8 +46,6 @@ export default function CoursePlayer() {
 
           setCourse(courseData);
 
-          // LOGIC REDIRECT: Jika user akses /learn/react tapi tidak ada lessonSlug
-          // Otomatis lempar ke lesson pertama
           if (!lessonSlug && courseData.lessons?.length > 0) {
             const firstLesson = courseData.lessons[0];
             navigate(
@@ -71,22 +65,17 @@ export default function CoursePlayer() {
     };
 
     if (user) initCourse();
-  }, [courseSlug, user, hasPurchased, navigate]); // Hapus 'course' dari depedency agar tidak infinite loop
+  }, [courseSlug, user, hasPurchased, navigate]);
 
-  // 2. SYNC URL DENGAN ACTIVE LESSON
-  // Setiap kali URL (lessonSlug) berubah, kita update tampilan materi
   useEffect(() => {
     if (course && course.lessons) {
       if (lessonSlug) {
-        // ⚡ DECODE URL parameter karena mungkin mengandung special characters
         const decodedSlug = decodeURIComponent(lessonSlug);
 
-        // Cari materi berdasarkan SLUG (sesuai schema)
         const foundLesson = course.lessons.find((l) => l.slug === decodedSlug);
         if (foundLesson) {
           setActiveLesson(foundLesson);
         } else {
-          // Jika slug ngawur (404), kembalikan ke materi pertama
           console.warn("Materi tidak ditemukan, redirecting...");
           if (course.lessons.length > 0) {
             navigate(
@@ -98,13 +87,11 @@ export default function CoursePlayer() {
           }
         }
       } else if (course.lessons.length > 0) {
-        // Fallback jika tidak ada slug di URL
         setActiveLesson(course.lessons[0]);
       }
     }
   }, [lessonSlug, course, courseSlug, navigate]);
 
-  // Helper Youtube
   const getYoutubeID = (url: string) => {
     if (!url) return null;
     const regExp =
@@ -113,13 +100,8 @@ export default function CoursePlayer() {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  // Navigasi saat Sidebar diklik
   const handleLessonClick = (lesson: Lesson) => {
-    // ⚡ ENCODE URL untuk handle special characters seperti &, (, ) di slug
     const encodedSlug = encodeURIComponent(lesson.slug);
-
-    // Kita TIDAK set state manual, tapi pindah URL.
-    // useEffect ke-2 akan otomatis menangkap perubahan ini dan mengupdate UI.
     navigate(`/learn/${courseSlug}/${encodedSlug}`);
   };
 
@@ -128,7 +110,6 @@ export default function CoursePlayer() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white">
-      {/* HEADER */}
       <header className="h-16 border-b border-gray-200 flex items-center justify-between px-6 bg-white shrink-0 z-10">
         <div className="flex items-center gap-4">
           <button
@@ -144,20 +125,18 @@ export default function CoursePlayer() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* SIDEBAR */}
         <aside className="w-80 border-r border-gray-200 bg-gray-50 flex flex-col overflow-y-auto hidden md:flex shrink-0">
           <div className="p-4 font-bold text-gray-700 border-b">
             Daftar Materi
           </div>
           <div className="flex-1 overflow-y-auto">
             {course.lessons?.map((lesson, idx) => {
-              // Cek aktif berdasarkan SLUG, bukan ID lagi (meski ID juga bisa)
               const isActive = activeLesson?.slug === lesson.slug;
 
               return (
                 <button
                   key={lesson._id}
-                  onClick={() => handleLessonClick(lesson)} // Panggil handler navigasi
+                  onClick={() => handleLessonClick(lesson)}
                   className={`w-full text-left p-4 text-sm border-b transition-colors flex gap-3
                                 ${
                                   isActive
@@ -178,11 +157,9 @@ export default function CoursePlayer() {
           </div>
         </aside>
 
-        {/* MAIN PLAYER */}
         <main className="flex-1 flex flex-col overflow-y-auto bg-white">
           {activeLesson ? (
             <>
-              {/* VIDEO PLAYER */}
               {activeLesson.videoUrl ? (
                 <div className="aspect-video w-full bg-black">
                   <iframe
@@ -203,7 +180,6 @@ export default function CoursePlayer() {
                 </div>
               )}
 
-              {/* TEXT CONTENT */}
               <div className="p-8 max-w-4xl mx-auto w-full">
                 <h2 className="text-2xl font-bold mb-6">
                   {activeLesson.title}

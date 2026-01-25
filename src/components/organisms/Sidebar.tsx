@@ -10,7 +10,6 @@ export default function Sidebar() {
 
   const isActive = (path: string) => pathname === path;
 
-  // --- DEFINISI MENU ---
   const studentMenus = [
     { name: "Cari Kursus", path: "/dashboard", icon: "🔍" },
     { name: "Belajar", path: "/my-courses", icon: "📚" },
@@ -34,7 +33,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -42,7 +40,6 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Hamburger Button (Mobile Only) */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200"
@@ -64,7 +61,6 @@ export default function Sidebar() {
         </svg>
       </button>
 
-      {/* Sidebar */}
       <aside
         className={`
           bg-white border-r border-gray-200 h-screen fixed left-0 top-0 flex flex-col z-50 transition-all duration-300
@@ -72,13 +68,11 @@ export default function Sidebar() {
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Logo Section */}
         <div className="h-20 flex items-center justify-between px-4 border-b border-gray-100">
           <Link to="/" className="text-2xl font-bold font-lexend text-gray-900">
             <img className="w-[180px]" src={logo} alt="logo" />
           </Link>
 
-          {/* Close Button (Mobile Only) */}
           <button
             onClick={() => setIsMobileOpen(false)}
             className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -100,7 +94,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* User Profile */}
         <div className="p-4 pb-2">
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
             {user?.profilePicture ? (
@@ -132,7 +125,6 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
           <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-lexend">
             Menu Utama
@@ -158,7 +150,6 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        {/* Logout Button */}
         <div className="p-3 border-t border-gray-100">
           <button
             onClick={logout}

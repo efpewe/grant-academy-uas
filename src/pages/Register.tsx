@@ -23,13 +23,12 @@ export default function Register() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Validasi username di frontend
     if (name === "username") {
       if (value && !/^[a-zA-Z0-9]*$/.test(value)) {
         setUsernameError(
           "Username hanya boleh huruf dan angka (tanpa spasi atau simbol)",
         );
-        return; // Tidak update state jika invalid
+        return;
       } else {
         setUsernameError("");
       }

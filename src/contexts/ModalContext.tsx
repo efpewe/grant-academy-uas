@@ -171,8 +171,8 @@ const AlertModal: React.FC<AlertModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-slideUp">
+    <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-in slide-in-from-bottom-5 duration-300">
         <div className="p-6 text-center">
           <div
             className={`w-16 h-16 rounded-full ${colors[type]} flex items-center justify-center text-3xl mx-auto mb-4`}
@@ -211,8 +211,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onCancel,
 }) => {
   return (
-    <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-slideUp">
+    <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-in slide-in-from-bottom-5 duration-300">
         <div className="p-6 text-center">
           <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-3xl mx-auto mb-4">
             ❓
@@ -269,7 +269,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({
   };
 
   return (
-    <div className="pointer-events-auto animate-slideInRight">
+    <div className="pointer-events-auto animate-in slide-in-from-right-24 duration-300">
       <div
         className={`${colors[type]} text-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 min-w-[300px] max-w-md`}
       >

@@ -80,7 +80,6 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <li className="flex flex-col md:flex-row md:items-center gap-4 md:gap-4 mt-4 md:mt-0">
-                  {/* Info User (Hanya tampil di Desktop) */}
                   <div className="hidden lg:block text-right mr-2">
                     <span className="block text-xs text-gray-400 font-lexend">
                       Halo,

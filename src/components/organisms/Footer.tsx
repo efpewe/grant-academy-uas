@@ -18,7 +18,7 @@ export default () => {
   ];
   return (
     <footer className="bg-dark text-[#f0f0f0] pt-[60px] mt-[80px] font-inter">
-      <div className="container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] gap-10 pb-10 text-center md:text-left">
+      <div className="w-[90%] max-w-[1140px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] gap-10 pb-10 text-center md:text-left">
         <div className="md:col-span-2 lg:col-span-1">
           <h3 className="text-white text-2xl font-bold font-lexend mb-4">
             Grant Academy

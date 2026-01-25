@@ -1,9 +1,7 @@
-// Imports tetap sama...
 import { useEffect, useState } from "react";
 import CourseCard from "../components/molecules/CourseCard";
 import SearchInput from "../components/molecules/SearchInput";
 import { courseService, type Course } from "../services/course.service";
-// Hapus MainLayout import karena akan dihandle di routing level (atau ganti wrapper)
 import DashboardLayout from "../components/templates/DashboardLayout";
 
 export default function Dashboard() {
@@ -44,7 +42,6 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      {/* Header Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 font-lexend">
           Marketplace Kursus
@@ -54,7 +51,6 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Search & Filter Bar */}
       <div className="flex flex-col md:flex-row gap-4 mb-8 justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
         <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
           {categories.map((cat) => (
@@ -80,7 +76,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Grid Content */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
           {[1, 2, 3].map((i) => (

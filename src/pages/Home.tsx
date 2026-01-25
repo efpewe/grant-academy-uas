@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import MainLayout from '../components/templates/MainLayout';
-import SectionTitle from '../components/atoms/SectionTitle';
-import CourseCard from '../components/molecules/CourseCard';
-import FeatureItem from '../components/molecules/FeatureItem';
-import HeroSection from '../components/organisms/HeroSection';
+import { useEffect, useState } from "react";
+import MainLayout from "../components/templates/MainLayout";
+import SectionTitle from "../components/atoms/SectionTitle";
+import CourseCard from "../components/molecules/CourseCard";
+import FeatureItem from "../components/molecules/FeatureItem";
+import HeroSection from "../components/organisms/HeroSection";
 
-import { courseService, type Course } from '../services/course.service';
+import { courseService, type Course } from "../services/course.service";
 
 export default function Home() {
   const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
@@ -30,13 +30,16 @@ export default function Home() {
     <MainLayout>
       <HeroSection />
       <section className="py-[80px] bg-white">
-        <div className="container mx-auto px-4">
+        <div className="w-[90%] max-w-[1140px] mx-auto mx-auto px-4">
           <SectionTitle>Kursus Unggulan Kami</SectionTitle>
-          
+
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[30px]">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-gray-100 rounded-xl h-[400px] animate-pulse"></div>
+                <div
+                  key={i}
+                  className="bg-gray-100 rounded-xl h-[400px] animate-pulse"
+                ></div>
               ))}
             </div>
           ) : (
@@ -56,21 +59,21 @@ export default function Home() {
       </section>
 
       <section className="py-[80px]">
-        <div className="container mx-auto px-4">
+        <div className="w-[90%] max-w-[1140px] mx-auto mx-auto px-4">
           <SectionTitle>Mengapa Grant Academy?</SectionTitle>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-[40px]">
-            <FeatureItem 
+            <FeatureItem
               icon="🎓"
               title="Instruktur Ahli"
               description="Belajar langsung dari praktisi yang berpengalaman di bidangnya."
             />
-            <FeatureItem 
+            <FeatureItem
               icon="⚡"
               title="Materi Terupdate"
               description="Kurikulum kami selalu disesuaikan dengan kebutuhan teknologi terbaru."
             />
-            <FeatureItem 
+            <FeatureItem
               icon="💼"
               title="Siap Kerja"
               description="Dengan portofolio dan studi kasus nyata, Anda siap bersaing."
@@ -78,7 +81,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
     </MainLayout>
   );
 }
