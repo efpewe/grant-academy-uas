@@ -91,6 +91,27 @@ export default function Login() {
       footerLink="/register"
       footerLinkText="Daftar Sekarang"
     >
+      {/* Back to Home Button */}
+      <a
+        href="/"
+        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors mb-4 group"
+      >
+        <svg
+          className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        Kembali ke Home
+      </a>
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm border border-red-100 flex items-center">
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
