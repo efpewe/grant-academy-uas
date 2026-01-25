@@ -88,8 +88,8 @@ export default function Register() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
         {/* Back to Home Button - Outside Card */}
-        <a
-          href="/"
+        <Link
+          to="/"
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors mb-4 group"
         >
           <svg
@@ -106,7 +106,7 @@ export default function Register() {
             />
           </svg>
           Kembali ke Home
-        </a>
+        </Link>
 
         <AuthLayout
           title="Buat Akun Baru"

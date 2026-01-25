@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../contexts/AuthContext";
 import { authService } from "../services/auth.service";
@@ -87,8 +87,8 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
         {/* Back to Home Button - Outside Card */}
-        <a
-          href="/"
+        <Link
+          to="/"
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors mb-4 group"
         >
           <svg
@@ -105,7 +105,7 @@ export default function Login() {
             />
           </svg>
           Kembali ke Home
-        </a>
+        </Link>
 
         <AuthLayout
           title="Selamat Datang Kembali"
