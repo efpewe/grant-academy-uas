@@ -12,6 +12,9 @@ export default function MentorDashboard() {
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     const fetchMyCourses = async () => {
@@ -31,8 +34,21 @@ export default function MentorDashboard() {
       }
     };
 
+    const fetchMentorStats = async () => {
+      try {
+        const response = await courseService.getMentorStats();
+        setTotalStudents(response.data.totalStudents);
+        setTotalRevenue(response.data.totalRevenue);
+      } catch (error) {
+        console.error("Gagal load statistik mentor", error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
     if (user) {
       fetchMyCourses();
+      fetchMentorStats();
     }
   }, [user]);
 
@@ -93,13 +109,17 @@ export default function MentorDashboard() {
           <div className="text-gray-500 text-sm font-medium mb-1">
             Total Siswa
           </div>
-          <div className="text-3xl font-bold text-gray-900">0</div>
+          <div className="text-3xl font-bold text-gray-900">
+            {statsLoading ? "..." : totalStudents}
+          </div>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
           <div className="text-gray-500 text-sm font-medium mb-1">
             Pendapatan
           </div>
-          <div className="text-3xl font-bold text-primary">Rp 0</div>
+          <div className="text-3xl font-bold text-primary">
+            {statsLoading ? "..." : formatPrice(totalRevenue)}
+          </div>
         </div>
       </div>
 

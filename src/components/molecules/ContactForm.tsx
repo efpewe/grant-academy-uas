@@ -1,11 +1,16 @@
 import Button from "../atoms/Button";
 import emailjs from "@emailjs/browser";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default () => {
   const form = useRef<HTMLFormElement>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSending(true);
+    setIsSuccess(false);
 
     if (form.current) {
       emailjs
@@ -13,9 +18,19 @@ export default () => {
           publicKey: "5koMvTcCXsGQVjS5q",
         })
         .then(
-          () => {},
+          () => {
+            setIsSuccess(true);
+            setIsSending(false);
+            if (form.current) {
+              form.current.reset();
+            }
+            setTimeout(() => {
+              setIsSuccess(false);
+            }, 5000);
+          },
           (error) => {
             console.error("Failed to send email:", error.text);
+            setIsSending(false);
           },
         );
     }
@@ -26,6 +41,22 @@ export default () => {
       <h2 className="text-[28px] text-dark mb-[20px] font-lexend font-bold">
         Kirim Pesan
       </h2>
+
+      {isSuccess && (
+        <div className="mb-[20px] p-[16px] bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-green-700 font-inter text-[15px] flex items-center gap-[8px]">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Pesan Anda berhasil terkirim! Kami akan segera menghubungi Anda.
+          </p>
+        </div>
+      )}
+
       <form ref={form} onSubmit={sendEmail} action="#">
         <div className="mb-[20px]">
           <label
@@ -95,7 +126,9 @@ export default () => {
           ></textarea>
         </div>
 
-        <Button type="submit">Kirim</Button>
+        <Button type="submit" disabled={isSending}>
+          {isSending ? "Mengirim..." : "Kirim"}
+        </Button>
       </form>
     </div>
   );

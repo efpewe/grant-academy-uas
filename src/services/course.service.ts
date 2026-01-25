@@ -70,4 +70,11 @@ export const courseService = {
     const response = await api.delete(`/courses/${courseId}`);
     return response.data;
   },
+
+  async getMentorStats(): Promise<
+    ApiResponse<{ totalStudents: number; totalRevenue: number }>
+  > {
+    const response = await api.get("/mentor/stats");
+    return response.data;
+  },
 };
