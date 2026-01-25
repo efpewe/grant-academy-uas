@@ -74,28 +74,31 @@ export default function Sidebar() {
         `}
       >
         {/* Logo Section */}
-        <div className="h-20 flex items-center justify-center px-4 border-b border-gray-100 relative">
-          {!isCollapsed && (
-            <Link
-              to="/"
-              className="text-2xl font-bold font-lexend text-gray-900"
-            >
-              <img className="w-[180px]" src={logo} alt="logo" />
-            </Link>
-          )}
-          {isCollapsed && (
-            <Link to="/" className="text-2xl font-bold text-primary">
-              GA
-            </Link>
-          )}
+        <div className="h-20 flex items-center justify-between px-4 border-b border-gray-100">
+          <div className="flex items-center flex-1 justify-center">
+            {!isCollapsed && (
+              <Link
+                to="/"
+                className="text-2xl font-bold font-lexend text-gray-900"
+              >
+                <img className="w-[180px]" src={logo} alt="logo" />
+              </Link>
+            )}
+            {isCollapsed && (
+              <Link to="/" className="text-2xl font-bold text-primary">
+                GA
+              </Link>
+            )}
+          </div>
 
-          {/* Toggle Button (Desktop) */}
+          {/* Toggle Button (Desktop) - Visible */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border border-gray-200 rounded-full items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
+            className="hidden lg:flex w-8 h-8 bg-gray-100 hover:bg-primary border border-gray-200 rounded-lg items-center justify-center transition-all shadow-sm group flex-shrink-0"
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             <svg
-              className={`w-3 h-3 text-gray-600 transition-transform ${isCollapsed ? "rotate-180" : ""}`}
+              className={`w-4 h-4 text-gray-600 group-hover:text-white transition-all ${isCollapsed ? "rotate-180" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
