@@ -41,6 +41,23 @@ export default function MentorDashboard() {
       minimumFractionDigits: 0,
     }).format(price);
 
+  const handleDeleteCourse = async (courseId: string, courseTitle: string) => {
+    const confirmed = window.confirm(
+      `Apakah Anda yakin ingin menghapus kursus "${courseTitle}"? Tindakan ini tidak dapat dibatalkan.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await courseService.deleteCourse(courseId);
+      alert("Kursus berhasil dihapus!");
+      setCourses(courses.filter((c) => c._id !== courseId));
+    } catch (error) {
+      console.error("Gagal menghapus kursus:", error);
+      alert("Gagal menghapus kursus. Silakan coba lagi.");
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-8">
@@ -153,10 +170,20 @@ export default function MentorDashboard() {
                         + Materi
                       </button>
 
-                      <button className="text-blue-600 hover:underline font-medium text-sm">
+                      <button
+                        onClick={() =>
+                          navigate(`/mentor/edit-course/${course._id}`)
+                        }
+                        className="text-blue-600 hover:underline font-medium text-sm"
+                      >
                         Edit
                       </button>
-                      <button className="text-red-500 hover:underline font-medium text-sm">
+                      <button
+                        onClick={() =>
+                          handleDeleteCourse(course._id, course.title)
+                        }
+                        className="text-red-500 hover:underline font-medium text-sm"
+                      >
                         Hapus
                       </button>
                     </td>

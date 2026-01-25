@@ -57,4 +57,17 @@ export const courseService = {
     const response = await api.post(`/courses/${courseId}/lessons`, data);
     return response.data;
   },
+
+  async updateCourse(
+    courseId: string,
+    formData: FormData,
+  ): Promise<ApiResponse<Course>> {
+    const response = await api.put(`/courses/${courseId}`, formData);
+    return response.data;
+  },
+
+  async deleteCourse(courseId: string): Promise<ApiResponse<void>> {
+    const response = await api.delete(`/courses/${courseId}`);
+    return response.data;
+  },
 };
