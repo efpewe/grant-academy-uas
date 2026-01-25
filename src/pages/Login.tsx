@@ -92,28 +92,28 @@ export default function Login() {
           footerText="Belum punya akun?"
           footerLink="/register"
           footerLinkText="Daftar Sekarang"
-        >
-          {/* Back to Home Button - Inside Card at Top Left */}
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors mb-6 group"
-          >
-            <svg
-              className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          backButton={
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors group"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Kembali ke Home
-          </Link>
-
+              <svg
+                className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              Kembali ke Home
+            </Link>
+          }
+        >
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm border border-red-100 flex items-center">
               <svg
