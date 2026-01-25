@@ -23,9 +23,10 @@ import CreateCourse from "./pages/mentor/CreateCourse";
 import AddLesson from "./pages/mentor/AddLesson";
 import EditCourse from "./pages/mentor/EditCourse";
 import CoursePlayer from "./pages/CoursePlayer";
+import { ModalProvider } from "./contexts/ModalContext";
 function App() {
   return (
-    <>
+    <ModalProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -59,7 +60,7 @@ function App() {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </ModalProvider>
   );
 }
 

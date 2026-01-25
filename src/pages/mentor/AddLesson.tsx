@@ -2,10 +2,12 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/templates/DashboardLayout";
 import { courseService } from "../../services/course.service";
+import { useModal } from "../../contexts/ModalContext";
 
 export default function AddLesson() {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const { showAlert } = useModal();
 
   const [loading, setLoading] = useState(false);
 
@@ -41,11 +43,14 @@ export default function AddLesson() {
       };
 
       await courseService.addLesson(courseId, payload);
-      alert("Materi berhasil ditambahkan!");
+      showAlert("Materi berhasil ditambahkan!", "success");
       navigate("/mentor/dashboard");
     } catch (error: any) {
       console.error(error);
-      alert(error.response?.data?.message || "Gagal menambah materi");
+      showAlert(
+        error.response?.data?.message || "Gagal menambah materi",
+        "error",
+      );
     } finally {
       setLoading(false);
     }

@@ -6,6 +6,7 @@ import {
   type Lesson,
 } from "../services/course.service";
 import { useAuth } from "../contexts/AuthContext";
+import { useModal } from "../contexts/ModalContext";
 
 export default function CoursePlayer() {
   // Tangkap DUA parameter dari URL
@@ -15,6 +16,7 @@ export default function CoursePlayer() {
   }>();
   const navigate = useNavigate();
   const { user, hasPurchased } = useAuth();
+  const { showAlert } = useModal();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
@@ -41,7 +43,7 @@ export default function CoursePlayer() {
           const isOwner = user?._id === mentorId;
 
           if (!isEnrolled && !isOwner) {
-            alert("⛔ Akses Ditolak: Anda belum terdaftar.");
+            showAlert("⛔ Akses Ditolak: Anda belum terdaftar.", "warning");
             navigate(`/course/${courseSlug}`);
             return;
           }

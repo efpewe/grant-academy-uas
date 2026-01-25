@@ -3,10 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "../../components/templates/DashboardLayout";
 import { courseService } from "../../services/course.service";
 import { AxiosError } from "axios";
+import { useModal } from "../../contexts/ModalContext";
 
 export default function EditCourse() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { showAlert } = useModal();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [preview, setPreview] = useState<string | null>(null);
@@ -29,7 +31,7 @@ export default function EditCourse() {
         const course = response.data.find((c) => c._id === id);
 
         if (!course) {
-          alert("Kursus tidak ditemukan");
+          showAlert("Kursus tidak ditemukan", "error");
           navigate("/mentor/dashboard");
           return;
         }
@@ -46,7 +48,7 @@ export default function EditCourse() {
         setPreview(course.thumbnail);
       } catch (error) {
         console.error("Gagal memuat data kursus:", error);
-        alert("Gagal memuat data kursus");
+        showAlert("Gagal memuat data kursus", "error");
       } finally {
         setFetching(false);
       }
@@ -67,13 +69,13 @@ export default function EditCourse() {
       const file = e.target.files[0];
 
       if (file.size > 2 * 1024 * 1024) {
-        alert("Ukuran file terlalu besar! Maksimal 2MB.");
+        showAlert("Ukuran file terlalu besar! Maksimal 2MB.", "warning");
         e.target.value = "";
         return;
       }
 
       if (!file.type.startsWith("image/")) {
-        alert("File harus berupa gambar!");
+        showAlert("File harus berupa gambar!", "warning");
         return;
       }
 
@@ -99,13 +101,13 @@ export default function EditCourse() {
       }
 
       if (!id) {
-        alert("ID kursus tidak ditemukan");
+        showAlert("ID kursus tidak ditemukan", "error");
         return;
       }
 
       await courseService.updateCourse(id, payload);
 
-      alert("Kursus berhasil diperbarui!");
+      showAlert("Kursus berhasil diperbarui!", "success");
       navigate("/mentor/dashboard");
     } catch (error) {
       console.error(error);
@@ -113,9 +115,9 @@ export default function EditCourse() {
       if (error instanceof AxiosError) {
         const message =
           error.response?.data?.message || "Gagal memperbarui kursus";
-        alert(`Error: ${message}`);
+        showAlert(`Error: ${message}`, "error");
       } else {
-        alert("Terjadi kesalahan sistem.");
+        showAlert("Terjadi kesalahan sistem.", "error");
       }
     } finally {
       setLoading(false);

@@ -5,12 +5,14 @@ import Badge from "../components/atoms/Badge";
 import { courseService, type Course } from "../services/course.service";
 import { transactionService } from "../services/transaction.service";
 import { useAuth } from "../contexts/AuthContext";
+import { useModal } from "../contexts/ModalContext";
 
 export default function CourseDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation(); // Hook untuk menyimpan history url saat ini
   const { user, isAuthenticated, hasPurchased, refreshProfile } = useAuth();
+  const { showAlert } = useModal();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
@@ -95,10 +97,10 @@ export default function CourseDetail() {
         msg.toLowerCase().includes("already") ||
         error.response?.status === 400
       ) {
-        alert("Anda sudah terdaftar di kelas ini.");
+        showAlert("Anda sudah terdaftar di kelas ini.", "info");
         navigate("/my-courses");
       } else {
-        alert(msg);
+        showAlert(msg, "error");
       }
     } finally {
       setProcessing(false);

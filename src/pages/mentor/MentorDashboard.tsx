@@ -3,10 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/templates/DashboardLayout";
 import { useAuth } from "../../contexts/AuthContext";
 import { courseService, type Course } from "../../services/course.service";
+import { useModal } from "../../contexts/ModalContext";
 
 export default function MentorDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showAlert, showConfirm } = useModal();
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,19 +44,20 @@ export default function MentorDashboard() {
     }).format(price);
 
   const handleDeleteCourse = async (courseId: string, courseTitle: string) => {
-    const confirmed = window.confirm(
+    const confirmed = await showConfirm(
       `Apakah Anda yakin ingin menghapus kursus "${courseTitle}"? Tindakan ini tidak dapat dibatalkan.`,
+      "Konfirmasi Hapus",
     );
 
     if (!confirmed) return;
 
     try {
       await courseService.deleteCourse(courseId);
-      alert("Kursus berhasil dihapus!");
+      showAlert("Kursus berhasil dihapus!", "success");
       setCourses(courses.filter((c) => c._id !== courseId));
     } catch (error) {
       console.error("Gagal menghapus kursus:", error);
-      alert("Gagal menghapus kursus. Silakan coba lagi.");
+      showAlert("Gagal menghapus kursus. Silakan coba lagi.", "error");
     }
   };
 

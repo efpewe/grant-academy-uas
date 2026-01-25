@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/templates/DashboardLayout";
 import { courseService } from "../../services/course.service";
 import { AxiosError } from "axios";
+import { useModal } from "../../contexts/ModalContext";
 
 export default function CreateCourse() {
   const navigate = useNavigate();
+  const { showAlert } = useModal();
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -30,13 +32,13 @@ export default function CreateCourse() {
       const file = e.target.files[0];
 
       if (file.size > 2 * 1024 * 1024) {
-        alert("Ukuran file terlalu besar! Maksimal 2MB.");
+        showAlert("Ukuran file terlalu besar! Maksimal 2MB.", "warning");
         e.target.value = "";
         return;
       }
 
       if (!file.type.startsWith("image/")) {
-        alert("File harus berupa gambar!");
+        showAlert("File harus berupa gambar!", "warning");
         return;
       }
 
@@ -63,16 +65,16 @@ export default function CreateCourse() {
 
       await courseService.createCourse(payload);
 
-      alert("Kursus berhasil dibuat!");
+      showAlert("Kursus berhasil dibuat!", "success");
       navigate("/dashboard");
     } catch (error) {
       console.error(error);
 
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message || "Gagal membuat kursus";
-        alert(`Error: ${message}`);
+        showAlert(`Error: ${message}`, "error");
       } else {
-        alert("Terjadi kesalahan sistem.");
+        showAlert("Terjadi kesalahan sistem.", "error");
       }
     } finally {
       setLoading(false);
