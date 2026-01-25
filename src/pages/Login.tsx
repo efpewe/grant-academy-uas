@@ -86,27 +86,6 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
-        {/* Back to Home Button - Outside Card */}
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors mb-4 group"
-        >
-          <svg
-            className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          Kembali ke Home
-        </Link>
-
         <AuthLayout
           title="Selamat Datang Kembali"
           subtitle="Masuk untuk melanjutkan pembelajaran di Grant Academy"
@@ -114,6 +93,27 @@ export default function Login() {
           footerLink="/register"
           footerLinkText="Daftar Sekarang"
         >
+          {/* Back to Home Button - Inside Card at Top Left */}
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors mb-6 group"
+          >
+            <svg
+              className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Kembali ke Home
+          </Link>
+
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm border border-red-100 flex items-center">
               <svg
