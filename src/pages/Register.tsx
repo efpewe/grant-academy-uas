@@ -133,7 +133,7 @@ export default function Register() {
             <FormGroup
               label="Username"
               name="username"
-              placeholder="Contoh: johnsmith123"
+              placeholder="Contoh: gybert123"
               value={formData.username}
               onChange={handleChange}
               required
@@ -163,7 +163,7 @@ export default function Register() {
                 label="Password"
                 name="password"
                 type="password"
-                placeholder="Min. 6 karakter"
+                placeholder="Masukkan Password"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -178,6 +178,12 @@ export default function Register() {
                 required
               />
             </div>
+            <p className="text-gray-400 text-xs mt-1">
+              <ul>
+                <li>Minimal 6 karakter</li>
+                <li>Wajib mengandung minimal 1 huruf besar, 1 huruf kecil, dan 1 angka</li>
+              </ul>
+            </p>
 
             <div className="pt-6">
               <Button type="submit" className="w-full" disabled={loading}>
