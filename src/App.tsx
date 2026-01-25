@@ -14,7 +14,7 @@ import Login from "./pages/Login";
 import Activation from "./pages/Activation";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./utils/ProtectedRoute";
 import MyCourses from "./pages/MyCourse";
 import Transactions from "./pages/Transactions";
 import Payment from "./pages/Payment";

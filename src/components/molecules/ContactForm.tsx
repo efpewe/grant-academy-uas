@@ -1,4 +1,4 @@
-import Button from "../atoms/Button";
+import { Button } from "../ui/button";
 import emailjs from "@emailjs/browser";
 import { useRef, useState } from "react";
 

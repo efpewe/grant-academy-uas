@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
-import MainLayout from '../components/templates/MainLayout'
-import Button from '../components/atoms/Button'
+import { Link } from "react-router-dom";
+import MainLayout from "../components/templates/MainLayout";
+import { Button } from "../components/ui/button";
 
 export default () => {
   return (
@@ -20,5 +20,5 @@ export default () => {
         </Link>
       </div>
     </MainLayout>
-  )
-}
+  );
+};

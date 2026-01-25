@@ -4,7 +4,7 @@ import { authService } from "../services/auth.service";
 
 import AuthLayout from "../components/templates/AuthLayout";
 import FormGroup from "../components/molecules/FormGroup";
-import Button from "../components/atoms/Button";
+import { Button } from "../components/ui/button";
 
 export default function Register() {
   const [formData, setFormData] = useState({

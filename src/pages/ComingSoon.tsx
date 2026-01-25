@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
-import MainLayout from '../components/templates/MainLayout'
-import Button from '../components/atoms/Button'
+import { Link } from "react-router-dom";
+import MainLayout from "../components/templates/MainLayout";
+import { Button } from "../components/ui/button";
 
 export default () => {
   return (
@@ -10,12 +10,13 @@ export default () => {
           Coming Soon
         </h1>
         <p className="text-lg text-grey font-inter mb-8 max-w-[500px]">
-          Halaman ini sedang dalam tahap pengembangan. Pantau terus untuk update selanjutnya!
+          Halaman ini sedang dalam tahap pengembangan. Pantau terus untuk update
+          selanjutnya!
         </p>
         <Link to="/">
           <Button>KEMBALI KE HOME</Button>
         </Link>
       </div>
     </MainLayout>
-  )
-}
+  );
+};

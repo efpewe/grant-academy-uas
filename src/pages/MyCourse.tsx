@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../components/templates/DashboardLayout";
 import CourseCard from "../components/molecules/CourseCard";
-import Button from "../components/atoms/Button";
+import { Button } from "../components/ui/button";
 import { transactionService } from "../services/transaction.service";
 import { type Course } from "../services/course.service";
 

@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { authService } from "../services/auth.service";
 import AuthLayout from "../components/templates/AuthLayout";
 import FormGroup from "../components/molecules/FormGroup";
-import Button from "../components/atoms/Button";
+import { Button } from "../components/ui/button";
 
 interface DecodedToken {
   id: string;
